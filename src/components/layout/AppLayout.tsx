@@ -7,7 +7,9 @@ import { Topbar } from './Topbar';
 import { MobileNav } from './MobileNav';
 import { NetworkBanner } from './NetworkBanner';
 import { PageTransition, Swipeable } from './PageTransition';
-import { ReactNode } from 'react';
+import { FAB } from './FAB';
+import { SearchOverlay } from './SearchOverlay';
+import { ReactNode, useState } from 'react';
 import { useMediaQuery } from '@/lib/hooks';
 
 interface AppLayoutProps {
@@ -17,6 +19,7 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps) {
   const { sidebarOpen, activePage } = useAppStore();
   const isMobile = useMediaQuery('(max-width: 768px)');
+  const [searchOpen, setSearchOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-surface-0">
@@ -33,7 +36,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       {!isMobile && <Topbar />}
 
       {/* Mobile header */}
-      {isMobile && <MobileHeader />}
+      {isMobile && <MobileHeader onSearch={() => setSearchOpen(true)} />}
 
       {/* Main content */}
       <main
@@ -59,11 +62,17 @@ export function AppLayout({ children }: AppLayoutProps) {
 
       {/* Mobile bottom navigation */}
       <MobileNav />
+
+      {/* Floating Action Button */}
+      <FAB />
+
+      {/* Search Overlay */}
+      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </div>
   );
 }
 
-function MobileHeader() {
+function MobileHeader({ onSearch }: { onSearch: () => void }) {
   const { notifications, activePage, goBack, pageHistory } = useAppStore();
   const unreadCount = notifications.length;
   const canGoBack = pageHistory.length > 1;
@@ -106,7 +115,10 @@ function MobileHeader() {
 
       <div className="flex items-center gap-1.5">
         {/* Search */}
-        <button className="p-2 rounded-xl hover:bg-surface-300/30 text-surface-700 active:scale-95 transition-all touch-manipulation">
+        <button
+          onClick={onSearch}
+          className="p-2 rounded-xl hover:bg-surface-300/30 text-surface-700 active:scale-95 transition-all touch-manipulation"
+        >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
           </svg>
