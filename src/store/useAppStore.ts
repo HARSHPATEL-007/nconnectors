@@ -8,9 +8,14 @@ interface AppState {
   // Navigation
   sidebarOpen: boolean;
   activePage: string;
+  pageHistory: string[];
   setSidebarOpen: (open: boolean) => void;
   toggleSidebar: () => void;
   setActivePage: (page: string) => void;
+  goBack: () => void;
+  // Network
+  isOnline: boolean;
+  setIsOnline: (online: boolean) => void;
 
   // Integrations
   integrations: Integration[];
@@ -58,9 +63,21 @@ export const useAppStore = create<AppState>((set, get) => ({
   // Navigation
   sidebarOpen: true,
   activePage: 'dashboard',
+  pageHistory: ['dashboard'],
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
-  setActivePage: (page) => set({ activePage: page }),
+  setActivePage: (page) => set((state) => ({
+    activePage: page,
+    pageHistory: [...state.pageHistory, page],
+  })),
+  goBack: () => set((state) => {
+    const history = state.pageHistory.slice(0, -1);
+    const previous = history[history.length - 1] || 'dashboard';
+    return { activePage: previous, pageHistory: history };
+  }),
+  // Network
+  isOnline: true,
+  setIsOnline: (online) => set({ isOnline: online }),
 
   // Integrations
   integrations: integrations,

@@ -17,7 +17,7 @@ const tabItems = [
   { id: 'integrations', label: 'Apps', icon: Plug },
   { id: 'agents', label: 'Agents', icon: Bot },
   { id: 'sessions', label: 'Sessions', icon: Activity },
-  { id: 'escalation', label: 'Alerts', icon: AlertTriangle, badge: 1 },
+  { id: 'escalation', label: 'Alerts', icon: AlertTriangle },
 ];
 
 export function MobileNav() {
@@ -29,8 +29,8 @@ export function MobileNav() {
   const alertBadge = notifications.filter(n => n.type === 'warning' || n.type === 'error').length;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom)]">
-      <div className="bg-surface-50/95 backdrop-blur-2xl border-t border-surface-300/30 px-2 pt-1.5">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 safe-bottom">
+      <div className="bg-surface-50/95 backdrop-blur-2xl border-t border-surface-300/30 px-1 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))]">
         <div className="flex items-center justify-around max-w-md mx-auto">
           {tabItems.map((item) => {
             const Icon = item.icon;
@@ -61,9 +61,13 @@ export function MobileNav() {
                 <div className="relative">
                   <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
                   {badge > 0 && (
-                    <span className="absolute -top-1.5 -right-2 w-4 h-4 text-[8px] font-bold bg-accent-rose text-white rounded-full flex items-center justify-center">
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 text-[8px] font-bold bg-accent-rose text-white rounded-full flex items-center justify-center px-1"
+                    >
                       {badge}
-                    </span>
+                    </motion.span>
                   )}
                 </div>
                 <span className={cn(
