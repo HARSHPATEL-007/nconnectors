@@ -22,7 +22,7 @@ export class GitHubAdapter extends BaseAdapter {
   }
 
   async list(params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: '/user/repos',
       params: { per_page: params?.per_page || '100', page: params?.page || '1' },
@@ -30,25 +30,25 @@ export class GitHubAdapter extends BaseAdapter {
   }
 
   async get(id: string): Promise<AdapterResponse> {
-    return this.request({ method: 'GET', path: `/repositories/${id}` });
+    return this.performRequest({ method: 'GET', path: `/repositories/${id}` });
   }
 
   async create(body: unknown): Promise<AdapterResponse> {
-    return this.request({ method: 'POST', path: '/user/repos', body });
+    return this.performRequest({ method: 'POST', path: '/user/repos', body });
   }
 
   async update(id: string, body: unknown): Promise<AdapterResponse> {
     const [owner, repo] = id.split('/');
-    return this.request({ method: 'PATCH', path: `/repos/${owner}/${repo}`, body });
+    return this.performRequest({ method: 'PATCH', path: `/repos/${owner}/${repo}`, body });
   }
 
   async delete(id: string): Promise<AdapterResponse> {
     const [owner, repo] = id.split('/');
-    return this.request({ method: 'DELETE', path: `/repos/${owner}/${repo}` });
+    return this.performRequest({ method: 'DELETE', path: `/repos/${owner}/${repo}` });
   }
 
   async listPullRequests(owner: string, repo: string, params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: `/repos/${owner}/${repo}/pulls`,
       params: { state: params?.state || 'open', per_page: params?.per_page || '30' },
@@ -56,11 +56,11 @@ export class GitHubAdapter extends BaseAdapter {
   }
 
   async createIssue(owner: string, repo: string, body: unknown): Promise<AdapterResponse> {
-    return this.request({ method: 'POST', path: `/repos/${owner}/${repo}/issues`, body });
+    return this.performRequest({ method: 'POST', path: `/repos/${owner}/${repo}/issues`, body });
   }
 
   async listIssues(owner: string, repo: string, params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: `/repos/${owner}/${repo}/issues`,
       params: { state: params?.state || 'open', per_page: params?.per_page || '30' },
@@ -68,11 +68,11 @@ export class GitHubAdapter extends BaseAdapter {
   }
 
   async listWorkflowRuns(owner: string, repo: string): Promise<AdapterResponse> {
-    return this.request({ method: 'GET', path: `/repos/${owner}/${repo}/actions/runs` });
+    return this.performRequest({ method: 'GET', path: `/repos/${owner}/${repo}/actions/runs` });
   }
 
   async mergePullRequest(owner: string, repo: string, pullNumber: number): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'PUT',
       path: `/repos/${owner}/${repo}/pulls/${pullNumber}/merge`,
       body: { merge_method: 'merge' },
@@ -101,7 +101,7 @@ export class GitLabAdapter extends BaseAdapter {
   }
 
   async list(params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: '/projects',
       params: { per_page: params?.per_page || '100', page: params?.page || '1' },
@@ -109,23 +109,23 @@ export class GitLabAdapter extends BaseAdapter {
   }
 
   async get(id: string): Promise<AdapterResponse> {
-    return this.request({ method: 'GET', path: `/projects/${id}` });
+    return this.performRequest({ method: 'GET', path: `/projects/${id}` });
   }
 
   async create(body: unknown): Promise<AdapterResponse> {
-    return this.request({ method: 'POST', path: '/projects', body });
+    return this.performRequest({ method: 'POST', path: '/projects', body });
   }
 
   async update(id: string, body: unknown): Promise<AdapterResponse> {
-    return this.request({ method: 'PUT', path: `/projects/${id}`, body });
+    return this.performRequest({ method: 'PUT', path: `/projects/${id}`, body });
   }
 
   async delete(id: string): Promise<AdapterResponse> {
-    return this.request({ method: 'DELETE', path: `/projects/${id}` });
+    return this.performRequest({ method: 'DELETE', path: `/projects/${id}` });
   }
 
   async listMergeRequests(projectId: string, params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: `/projects/${projectId}/merge_requests`,
       params: { state: params?.state || 'opened', per_page: params?.per_page || '30' },
@@ -133,7 +133,7 @@ export class GitLabAdapter extends BaseAdapter {
   }
 
   async listIssues(projectId: string, params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: `/projects/${projectId}/issues`,
       params: { state: params?.state || 'opened', per_page: params?.per_page || '30' },
@@ -141,7 +141,7 @@ export class GitLabAdapter extends BaseAdapter {
   }
 
   async listPipelines(projectId: string): Promise<AdapterResponse> {
-    return this.request({ method: 'GET', path: `/projects/${projectId}/pipelines` });
+    return this.performRequest({ method: 'GET', path: `/projects/${projectId}/pipelines` });
   }
 }
 
@@ -166,7 +166,7 @@ export class JiraAdapter extends BaseAdapter {
   }
 
   async list(params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: '/search',
       params: { jql: params?.jql || 'order by created DESC', maxResults: params?.maxResults || '50', startAt: params?.startAt || '0' },
@@ -174,35 +174,35 @@ export class JiraAdapter extends BaseAdapter {
   }
 
   async get(id: string): Promise<AdapterResponse> {
-    return this.request({ method: 'GET', path: `/issue/${id}` });
+    return this.performRequest({ method: 'GET', path: `/issue/${id}` });
   }
 
   async create(body: unknown): Promise<AdapterResponse> {
-    return this.request({ method: 'POST', path: '/issue', body });
+    return this.performRequest({ method: 'POST', path: '/issue', body });
   }
 
   async update(id: string, body: unknown): Promise<AdapterResponse> {
-    return this.request({ method: 'PUT', path: `/issue/${id}`, body });
+    return this.performRequest({ method: 'PUT', path: `/issue/${id}`, body });
   }
 
   async delete(id: string): Promise<AdapterResponse> {
-    return this.request({ method: 'DELETE', path: `/issue/${id}` });
+    return this.performRequest({ method: 'DELETE', path: `/issue/${id}` });
   }
 
   async getProjects(): Promise<AdapterResponse> {
-    return this.request({ method: 'GET', path: '/project' });
+    return this.performRequest({ method: 'GET', path: '/project' });
   }
 
   async getBoards(): Promise<AdapterResponse> {
-    return this.request({ method: 'GET', path: '/board' });
+    return this.performRequest({ method: 'GET', path: '/board' });
   }
 
   async getSprints(boardId: string): Promise<AdapterResponse> {
-    return this.request({ method: 'GET', path: `/board/${boardId}/sprint` });
+    return this.performRequest({ method: 'GET', path: `/board/${boardId}/sprint` });
   }
 
   async transitionIssue(issueId: string, transitionId: string): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'POST',
       path: `/issue/${issueId}/transitions`,
       body: { transition: { id: transitionId } },
@@ -210,7 +210,7 @@ export class JiraAdapter extends BaseAdapter {
   }
 
   async addComment(issueId: string, body: string): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'POST',
       path: `/issue/${issueId}/comment`,
       body: { body },

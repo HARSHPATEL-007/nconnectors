@@ -25,7 +25,7 @@ export class SalesforceAdapter extends BaseAdapter {
     const sobject = params?.sobject || 'Account';
     const limit = params?.limit || '200';
     const offset = params?.offset || '0';
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: `/sobjects/${sobject}`,
       params: { limit, offset },
@@ -34,39 +34,39 @@ export class SalesforceAdapter extends BaseAdapter {
 
   async get(id: string): Promise<AdapterResponse> {
     const sobject = 'Account';
-    return this.request({ method: 'GET', path: `/sobjects/${sobject}/${id}` });
+    return this.performRequest({ method: 'GET', path: `/sobjects/${sobject}/${id}` });
   }
 
   async create(body: unknown): Promise<AdapterResponse> {
     const sobject = 'Account';
-    return this.request({ method: 'POST', path: `/sobjects/${sobject}`, body });
+    return this.performRequest({ method: 'POST', path: `/sobjects/${sobject}`, body });
   }
 
   async update(id: string, body: unknown): Promise<AdapterResponse> {
     const sobject = 'Account';
-    return this.request({ method: 'PATCH', path: `/sobjects/${sobject}/${id}`, body });
+    return this.performRequest({ method: 'PATCH', path: `/sobjects/${sobject}/${id}`, body });
   }
 
   async delete(id: string): Promise<AdapterResponse> {
     const sobject = 'Account';
-    return this.request({ method: 'DELETE', path: `/sobjects/${sobject}/${id}` });
+    return this.performRequest({ method: 'DELETE', path: `/sobjects/${sobject}/${id}` });
   }
 
   // Salesforce-specific methods
   async query(soql: string): Promise<AdapterResponse> {
-    return this.request({ method: 'GET', path: '/query', params: { q: soql } });
+    return this.performRequest({ method: 'GET', path: '/query', params: { q: soql } });
   }
 
   async search(query: string): Promise<AdapterResponse> {
-    return this.request({ method: 'GET', path: '/search', params: { q: query } });
+    return this.performRequest({ method: 'GET', path: '/search', params: { q: query } });
   }
 
   async describe(sobject: string): Promise<AdapterResponse> {
-    return this.request({ method: 'GET', path: `/sobjects/${sobject}/describe` });
+    return this.performRequest({ method: 'GET', path: `/sobjects/${sobject}/describe` });
   }
 
   async getLeads(params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: '/sobjects/Lead',
       params: { limit: params?.limit || '200', offset: params?.offset || '0' },
@@ -74,7 +74,7 @@ export class SalesforceAdapter extends BaseAdapter {
   }
 
   async getOpportunities(params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: '/sobjects/Opportunity',
       params: { limit: params?.limit || '200', offset: params?.offset || '0' },
@@ -82,7 +82,7 @@ export class SalesforceAdapter extends BaseAdapter {
   }
 
   async getContacts(params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: '/sobjects/Contact',
       params: { limit: params?.limit || '200', offset: params?.offset || '0' },
@@ -111,7 +111,7 @@ export class HubSpotAdapter extends BaseAdapter {
   }
 
   async list(params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: '/crm/v3/objects/contacts',
       params: { limit: params?.limit || '100', after: params?.after || '' },
@@ -119,23 +119,23 @@ export class HubSpotAdapter extends BaseAdapter {
   }
 
   async get(id: string): Promise<AdapterResponse> {
-    return this.request({ method: 'GET', path: `/crm/v3/objects/contacts/${id}` });
+    return this.performRequest({ method: 'GET', path: `/crm/v3/objects/contacts/${id}` });
   }
 
   async create(body: unknown): Promise<AdapterResponse> {
-    return this.request({ method: 'POST', path: '/crm/v3/objects/contacts', body });
+    return this.performRequest({ method: 'POST', path: '/crm/v3/objects/contacts', body });
   }
 
   async update(id: string, body: unknown): Promise<AdapterResponse> {
-    return this.request({ method: 'PATCH', path: `/crm/v3/objects/contacts/${id}`, body });
+    return this.performRequest({ method: 'PATCH', path: `/crm/v3/objects/contacts/${id}`, body });
   }
 
   async delete(id: string): Promise<AdapterResponse> {
-    return this.request({ method: 'DELETE', path: `/crm/v3/objects/contacts/${id}` });
+    return this.performRequest({ method: 'DELETE', path: `/crm/v3/objects/contacts/${id}` });
   }
 
   async getCompanies(params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: '/crm/v3/objects/companies',
       params: { limit: params?.limit || '100' },
@@ -143,7 +143,7 @@ export class HubSpotAdapter extends BaseAdapter {
   }
 
   async getDeals(params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: '/crm/v3/objects/deals',
       params: { limit: params?.limit || '100' },
@@ -151,7 +151,7 @@ export class HubSpotAdapter extends BaseAdapter {
   }
 
   async searchContacts(query: string): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'POST',
       path: '/crm/v3/objects/contacts/search',
       body: { query, limit: 100 },
@@ -179,7 +179,7 @@ export class PipedriveAdapter extends BaseAdapter {
   }
 
   async list(params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: '/persons',
       params: { limit: params?.limit || '500', start: params?.start || '0' },
@@ -187,23 +187,23 @@ export class PipedriveAdapter extends BaseAdapter {
   }
 
   async get(id: string): Promise<AdapterResponse> {
-    return this.request({ method: 'GET', path: `/persons/${id}` });
+    return this.performRequest({ method: 'GET', path: `/persons/${id}` });
   }
 
   async create(body: unknown): Promise<AdapterResponse> {
-    return this.request({ method: 'POST', path: '/persons', body });
+    return this.performRequest({ method: 'POST', path: '/persons', body });
   }
 
   async update(id: string, body: unknown): Promise<AdapterResponse> {
-    return this.request({ method: 'PUT', path: `/persons/${id}`, body });
+    return this.performRequest({ method: 'PUT', path: `/persons/${id}`, body });
   }
 
   async delete(id: string): Promise<AdapterResponse> {
-    return this.request({ method: 'DELETE', path: `/persons/${id}` });
+    return this.performRequest({ method: 'DELETE', path: `/persons/${id}` });
   }
 
   async getDeals(params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: '/deals',
       params: { limit: params?.limit || '500' },
@@ -211,7 +211,7 @@ export class PipedriveAdapter extends BaseAdapter {
   }
 
   async getOrganizations(params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: '/organizations',
       params: { limit: params?.limit || '500' },
@@ -219,7 +219,7 @@ export class PipedriveAdapter extends BaseAdapter {
   }
 
   async search(term: string): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: '/searchResults',
       params: { term, limit: '100' },

@@ -21,7 +21,7 @@ export class StripeAdapter extends BaseAdapter {
   }
 
   async list(params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: '/customers',
       params: { limit: params?.limit || '100', starting_after: params?.starting_after || '' },
@@ -29,23 +29,23 @@ export class StripeAdapter extends BaseAdapter {
   }
 
   async get(id: string): Promise<AdapterResponse> {
-    return this.request({ method: 'GET', path: `/customers/${id}` });
+    return this.performRequest({ method: 'GET', path: `/customers/${id}` });
   }
 
   async create(body: unknown): Promise<AdapterResponse> {
-    return this.request({ method: 'POST', path: '/customers', body });
+    return this.performRequest({ method: 'POST', path: '/customers', body });
   }
 
   async update(id: string, body: unknown): Promise<AdapterResponse> {
-    return this.request({ method: 'POST', path: `/customers/${id}`, body });
+    return this.performRequest({ method: 'POST', path: `/customers/${id}`, body });
   }
 
   async delete(id: string): Promise<AdapterResponse> {
-    return this.request({ method: 'DELETE', path: `/customers/${id}` });
+    return this.performRequest({ method: 'DELETE', path: `/customers/${id}` });
   }
 
   async createCharge(amount: number, currency: string, customerId?: string): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'POST',
       path: '/charges',
       body: { amount, currency, customer: customerId },
@@ -53,7 +53,7 @@ export class StripeAdapter extends BaseAdapter {
   }
 
   async listCharges(params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: '/charges',
       params: { limit: params?.limit || '100' },
@@ -61,11 +61,11 @@ export class StripeAdapter extends BaseAdapter {
   }
 
   async createRefund(chargeId: string): Promise<AdapterResponse> {
-    return this.request({ method: 'POST', path: '/refunds', body: { charge: chargeId } });
+    return this.performRequest({ method: 'POST', path: '/refunds', body: { charge: chargeId } });
   }
 
   async listSubscriptions(params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: '/subscriptions',
       params: { limit: params?.limit || '100' },
@@ -93,7 +93,7 @@ export class PayPalAdapter extends BaseAdapter {
   }
 
   async list(params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: '/payments',
       params: { page_size: params?.page_size || '100', page: params?.page || '1' },
@@ -101,23 +101,23 @@ export class PayPalAdapter extends BaseAdapter {
   }
 
   async get(id: string): Promise<AdapterResponse> {
-    return this.request({ method: 'GET', path: `/payments/${id}` });
+    return this.performRequest({ method: 'GET', path: `/payments/${id}` });
   }
 
   async create(body: unknown): Promise<AdapterResponse> {
-    return this.request({ method: 'POST', path: '/payments', body });
+    return this.performRequest({ method: 'POST', path: '/payments', body });
   }
 
   async update(id: string, body: unknown): Promise<AdapterResponse> {
-    return this.request({ method: 'PATCH', path: `/payments/${id}`, body });
+    return this.performRequest({ method: 'PATCH', path: `/payments/${id}`, body });
   }
 
   async delete(id: string): Promise<AdapterResponse> {
-    return this.request({ method: 'DELETE', path: `/payments/${id}` });
+    return this.performRequest({ method: 'DELETE', path: `/payments/${id}` });
   }
 
   async createOrder(amount: string, currency: string): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'POST',
       path: '/checkout/orders',
       body: {
@@ -128,11 +128,11 @@ export class PayPalAdapter extends BaseAdapter {
   }
 
   async captureOrder(orderId: string): Promise<AdapterResponse> {
-    return this.request({ method: 'POST', path: `/checkout/orders/${orderId}/capture` });
+    return this.performRequest({ method: 'POST', path: `/checkout/orders/${orderId}/capture` });
   }
 
   async listTransactions(params?: Record<string, string>): Promise<AdapterResponse> {
-    return this.request({
+    return this.performRequest({
       method: 'GET',
       path: '/transactions',
       params: { start_date: params?.start_date || '', end_date: params?.end_date || '' },

@@ -57,7 +57,7 @@ export interface Adapter {
   readonly config: AdapterConfig;
   readonly credentials: AuthCredentials;
 
-  request<T>(options: RequestOptions): Promise<AdapterResponse<T>>;
+  performRequest<T>(options: RequestOptions): Promise<AdapterResponse<T>>;
 
   // Standard CRUD operations
   list(params?: Record<string, string>): Promise<AdapterResponse>;
@@ -93,7 +93,7 @@ export abstract class BaseAdapter implements Adapter {
 
   async ping(): Promise<boolean> {
     try {
-      const response = await this.request({ method: 'GET', path: '/health' });
+      const response = await this.performRequest({ method: 'GET', path: '/health' });
       return response.success;
     } catch {
       return false;
@@ -104,7 +104,7 @@ export abstract class BaseAdapter implements Adapter {
     return { remaining: this.rateLimitRemaining, resetAt: this.rateLimitResetAt };
   }
 
-  async request<T>(options: RequestOptions): Promise<AdapterResponse<T>> {
+  async performRequest<T>(options: RequestOptions): Promise<AdapterResponse<T>> {
     // Rate limiting
     if (this.config.rateLimit) {
       await this.enforceRateLimit();
