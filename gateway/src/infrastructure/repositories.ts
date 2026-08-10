@@ -1,5 +1,5 @@
-import { prisma } from '../infrastructure/database.js';
-import { cacheGet, cacheSet, cacheDelete } from '../infrastructure/redis.js';
+import { prisma } from './database.js';
+import { cacheGet, cacheSet, cacheDelete } from './redis.js';
 import { encrypt, decrypt, generateApiKey, generateConnectionId, generateAgentId, hashData, generateMerkleRoot } from '../services/crypto.js';
 import type { Agent, ConnectedAccount, Session, AuditEntry, EscalationCase, Recipe } from '../types/index.js';
 

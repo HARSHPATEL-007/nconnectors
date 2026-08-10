@@ -1,9 +1,9 @@
 import { createServer } from 'node:http';
 import { URL } from 'node:url';
 import type { Agent } from '../types/index.js';
-import { encrypt, decrypt } from '../services/crypto.js';
-import { prisma } from '../database.js';
-import { logger } from '../logger.js';
+import { encrypt, decrypt } from './crypto.js';
+import { prisma } from '../infrastructure/database.js';
+import { logger } from '../infrastructure/logger.js';
 
 interface OAuthProvider {
   name: string;

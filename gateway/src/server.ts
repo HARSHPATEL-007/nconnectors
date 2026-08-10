@@ -1,19 +1,19 @@
 import express from 'express';
 import type { Server } from 'node:http';
 import { WebSocketServer, WebSocket } from 'ws';
-import type { Agent, Session, TransportType } from '../types/index.js';
-import { config, MCP_VERSION } from '../config/index.js';
-import { logger } from '../infrastructure/logger.js';
-import { healthService } from '../infrastructure/health.js';
-import { authenticateAgent, rateLimit, requestLogger, errorHandler } from '../infrastructure/middleware.js';
-import { oauthService } from '../services/oauth.js';
-import { webhookService } from '../services/webhook.js';
-import { toolRegistry } from '../services/tool-registry.js';
-import { hitlService } from '../services/hitl.js';
-import { schemaModifier } from '../services/modifiers.js';
-import { createConnector } from '../services/connectors.js';
-import { encrypt, decrypt, generateApiKey, generateConnectionId, generateAgentId, generateSessionId, generateAuditId, generateEscalationId, generateRecipeId, hashData, generateMerkleRoot } from '../services/crypto.js';
-import * as repo from '../infrastructure/repositories.js';
+import type { Agent, Session, TransportType } from './types/index.js';
+import { config, MCP_VERSION } from './config/index.js';
+import { logger } from './infrastructure/logger.js';
+import { healthService } from './infrastructure/health.js';
+import { authenticateAgent, rateLimit, requestLogger, errorHandler } from './infrastructure/middleware.js';
+import { oauthService } from './services/oauth.js';
+import { webhookService } from './services/webhook.js';
+import { toolRegistry } from './services/tool-registry.js';
+import { hitlService } from './services/hitl.js';
+import { schemaModifier } from './services/modifiers.js';
+import { createConnector } from './services/connectors.js';
+import { encrypt, decrypt, generateApiKey, generateConnectionId, generateAgentId, generateSessionId, generateAuditId, generateEscalationId, generateRecipeId, hashData, generateMerkleRoot } from './services/crypto.js';
+import * as repo from './infrastructure/repositories.js';
 
 class ProductionGateway {
   private app: express.Application;
