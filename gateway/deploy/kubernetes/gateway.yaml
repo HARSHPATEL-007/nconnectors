@@ -1,0 +1,160 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: n0va1o
+  labels:
+    app.kubernetes.io/name: n0va1o
+    app.kubernetes.io/version: "2026.07.0"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: n0va1o-config
+  namespace: n0va1o
+data:
+  NODE_ENV: "production"
+  N0VA1O_HOST: "0.0.0.0"
+  N0VA1O_PORT: "3001"
+  N0VA1O_TRANSPORTS: "http_sse,websocket"
+  LOG_LEVEL: "info"
+  AUDIT_MERKLE_TREE: "true"
+  AUDIT_RETENTION_DAYS: "365"
+  HITL_CRITICAL_TIMEOUT_HOURS: "4"
+  HITL_HIGH_TIMEOUT_HOURS: "24"
+  HITL_MEDIUM_TIMEOUT_HOURS: "72"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: n0va1o-secrets
+  namespace: n0va1o
+type: Opaque
+stringData:
+  DATABASE_URL: "postgresql://n0va1o:n0va1o_secret@postgres:5432/n0va1o?schema=public"
+  REDIS_URL: "redis://redis:6379"
+  N0VA1O_MASTER_KEY: "change-this-to-a-secure-256-bit-key-in-production"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n0va1o-gateway
+  namespace: n0va1o
+  labels:
+    app: n0va1o-gateway
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: n0va1o-gateway
+  template:
+    metadata:
+      labels:
+        app: n0va1o-gateway
+    spec:
+      containers:
+        - name: gateway
+          image: n0va1o/gateway:2026.07.0
+          ports:
+            - containerPort: 3001
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: n0va1o-config
+            - secretRef:
+                name: n0va1o-secrets
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "2000m"
+              memory: "2Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3001
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: n0va1o-gateway
+  namespace: n0va1o
+spec:
+  selector:
+    app: n0va1o-gateway
+  ports:
+    - port: 80
+      targetPort: 3001
+      protocol: TCP
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: n0va1o-gateway
+  namespace: n0va1o
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+spec:
+  rules:
+    - host: n0va1o.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: n0va1o-gateway
+                port:
+                  number: 80
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: n0va1o-gateway
+  namespace: n0va1o
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: n0va1o-gateway
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: n0va1o-gateway
+  namespace: n0va1o
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: n0va1o-gateway
