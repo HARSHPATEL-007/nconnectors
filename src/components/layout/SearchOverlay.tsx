@@ -3,8 +3,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { Search, X, ArrowRight } from 'lucide-react';
-import { integrations } from '@/data/integrations';
-import { agents } from '@/data/agents';
 import { useAppStore } from '@/store/useAppStore';
 
 interface SearchOverlayProps {
@@ -13,21 +11,21 @@ interface SearchOverlayProps {
 }
 
 export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
-  const [query, setQuery] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
-  const { setActivePage } = useAppStore();
+   const [query, setQuery] = useState('');
+   const inputRef = useRef<HTMLInputElement>(null);
+   const { setActivePage, integrations, agents } = useAppStore();
 
-  useEffect(() => {
-    if (open) {
-      setTimeout(() => inputRef.current?.focus(), 100);
-    } else {
-      setQuery('');
-    }
-  }, [open]);
+   useEffect(() => {
+     if (open) {
+       setTimeout(() => inputRef.current?.focus(), 100);
+     } else {
+       setQuery('');
+     }
+   }, [open]);
 
-  const results = query.length > 0 ? [
-    ...integrations.filter(i => i.name.toLowerCase().includes(query.toLowerCase())).map(i => ({ type: 'integration' as const, id: i.id, title: i.name, subtitle: i.subcategory, page: 'integrations' })),
-    ...agents.filter(a => a.name.toLowerCase().includes(query.toLowerCase())).map(a => ({ type: 'agent' as const, id: a.id, title: a.name, subtitle: a.type, page: 'agents' })),
+   const results = query.length > 0 ? [
+     ...integrations.filter(i => i.name.toLowerCase().includes(query.toLowerCase())).map(i => ({ type: 'integration' as const, id: i.id, title: i.name, subtitle: i.category, page: 'integrations' })),
+     ...agents.filter(a => a.name.toLowerCase().includes(query.toLowerCase())).map(a => ({ type: 'agent' as const, id: a.agent_id, title: a.name, subtitle: a.type, page: 'agents' })),
   ].slice(0, 8) : [];
 
   const recentSearches = ['Meta Ads', 'Finance Agent', 'GitHub', 'Sessions'];

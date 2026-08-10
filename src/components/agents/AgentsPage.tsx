@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Progress } from '@/components/ui/Progress';
 import { useAppStore } from '@/store/useAppStore';
 import { Modal } from '@/components/ui/Modal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { formatNumber, formatLatency } from '@/lib/utils';
 import { useMediaQuery } from '@/lib/hooks';
 import {
@@ -28,9 +28,13 @@ const autonomyColors = {
 } as const;
 
 export function AgentsPage() {
-  const { agents, selectedAgent, setSelectedAgent, toggleAgentStatus } = useAppStore();
-  const [showCreate, setShowCreate] = useState(false);
-  const isMobile = useMediaQuery('(max-width: 768px)');
+   const { agents, selectedAgent, setSelectedAgent, toggleAgentStatus, fetchAgents, loading } = useAppStore();
+   const [showCreate, setShowCreate] = useState(false);
+   const isMobile = useMediaQuery('(max-width: 768px)');
+
+   useEffect(() => {
+     fetchAgents();
+   }, []);
 
   return (
     <div className="space-y-4 md:space-y-6 animate-fade-in">
@@ -57,10 +61,10 @@ export function AgentsPage() {
       </div>
 
       {/* Agent Grid - 1 col mobile, 2-3 cols desktop */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-        {agents.map((agent) => (
-          <motion.div
-            key={agent.id}
+       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+         {agents.map((agent) => (
+           <motion.div
+             key={agent.agent_id}
             whileTap={isMobile ? { scale: 0.98 } : undefined}
             transition={{ duration: 0.1 }}
           >
@@ -110,46 +114,37 @@ export function AgentsPage() {
 
               {/* Metrics */}
               <div className="grid grid-cols-3 gap-1.5 mb-3">
-                <div className="text-center p-1.5 rounded-lg bg-surface-200/30">
-                  <p className="text-[11px] font-semibold text-surface-950">{formatNumber(agent.dailyActions)}</p>
-                  <p className="text-[8px] text-surface-600">Actions</p>
-                </div>
-                <div className="text-center p-1.5 rounded-lg bg-surface-200/30">
-                  <p className="text-[11px] font-semibold text-surface-950">{Math.round(agent.successRate * 100)}%</p>
-                  <p className="text-[8px] text-surface-600">Success</p>
-                </div>
-                <div className="text-center p-1.5 rounded-lg bg-surface-200/30">
-                  <p className="text-[11px] font-semibold text-surface-950">{formatLatency(agent.avgLatency)}</p>
-                  <p className="text-[8px] text-surface-600">Latency</p>
-                </div>
-              </div>
+                 <div className="text-center p-1.5 rounded-lg bg-surface-200/30">
+                   <p className="text-[11px] font-semibold text-surface-950">{formatNumber(agent.max_daily_actions)}</p>
+                   <p className="text-[8px] text-surface-600">Quota</p>
+                 </div>
+                 <div className="text-center p-1.5 rounded-lg bg-surface-200/30">
+                   <p className="text-[11px] font-semibold text-surface-950">{agent.tools_available?.length || 0}</p>
+                   <p className="text-[8px] text-surface-600">Tools</p>
+                 </div>
+                 <div className="text-center p-1.5 rounded-lg bg-surface-200/30">
+                   <p className="text-[11px] font-semibold text-surface-950">{agent.sandbox_enabled ? 'Yes' : 'No'}</p>
+                   <p className="text-[8px] text-surface-600">Sandbox</p>
+                 </div>
+               </div>
 
-              {/* Daily quota */}
-              <div className="mb-3">
-                <div className="flex justify-between mb-1">
-                  <span className="text-[10px] text-surface-600">Daily quota</span>
-                  <span className="text-[10px] text-surface-700">{formatNumber(agent.dailyActions)}/{formatNumber(agent.maxDailyActions)}</span>
-                </div>
-                <Progress value={agent.dailyActions} max={agent.maxDailyActions} size="sm" color="bg-n0va-500" />
-              </div>
-
-              {/* Footer */}
-              <div className="flex items-center justify-between pt-2.5 border-t border-surface-300/20">
-                <div className="flex items-center gap-1.5">
-                  <Badge variant={autonomyColors[agent.autonomyLevel]} size="sm">{agent.autonomyLevel}</Badge>
-                  {agent.sandboxEnabled && (
-                    <Badge variant="outline" size="sm" className="flex items-center gap-0.5">
-                      <Cpu size={8} />
-                    </Badge>
-                  )}
-                </div>
-                <button
-                  onClick={(e) => { e.stopPropagation(); toggleAgentStatus(agent.id); }}
-                  className="p-2 -m-1 rounded-lg hover:bg-surface-300/30 text-surface-600 active:scale-90 transition-all touch-manipulation"
-                >
-                  {agent.status === 'active' ? <Pause size={14} /> : <Play size={14} />}
-                </button>
-              </div>
+               {/* Footer */}
+               <div className="flex items-center justify-between pt-2.5 border-t border-surface-300/20">
+                 <div className="flex items-center gap-1.5">
+                   <Badge variant={autonomyColors[agent.autonomy_level]} size="sm">{agent.autonomy_level}</Badge>
+                   {agent.sandbox_enabled && (
+                     <Badge variant="outline" size="sm" className="flex items-center gap-0.5">
+                       <Cpu size={8} />
+                     </Badge>
+                   )}
+                 </div>
+                 <button
+                   onClick={(e) => { e.stopPropagation(); toggleAgentStatus(agent.agent_id); }}
+                   className="p-2 -m-1 rounded-lg hover:bg-surface-300/30 text-surface-600 active:scale-90 transition-all touch-manipulation"
+                 >
+                   {agent.status === 'active' ? <Pause size={14} /> : <Play size={14} />}
+                 </button>
+               </div>
             </Card>
           </motion.div>
         ))}
