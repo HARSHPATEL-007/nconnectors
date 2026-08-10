@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  background-color: #0a0a0f;
+  color: #e5e7eb;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2a3a;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a4a;
+}
+
+@layer components {
+  .nova-input {
+    @apply bg-nova-surface border border-nova-border rounded-lg px-4 py-2 text-nova-text placeholder-nova-muted focus:outline-none focus:border-nova-accent transition-colors;
+  }
+
+  .nova-button {
+    @apply bg-nova-accent hover:bg-nova-accent-hover text-white font-medium rounded-lg px-4 py-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .nova-button-secondary {
+    @apply bg-nova-surface border border-nova-border text-nova-text hover:bg-nova-border rounded-lg px-4 py-2 transition-colors;
+  }
+}
