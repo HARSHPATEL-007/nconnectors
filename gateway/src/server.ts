@@ -14,6 +14,7 @@ import { schemaModifier } from './services/modifiers.js';
 import { createConnector } from './services/connectors.js';
 import { encrypt, decrypt, generateApiKey, generateConnectionId, generateAgentId, generateSessionId, generateAuditId, generateEscalationId, generateRecipeId, hashData, generateMerkleRoot } from './services/crypto.js';
 import * as repo from './infrastructure/repositories.js';
+import { prisma } from './infrastructure/database.js';
 
 class ProductionGateway {
   private app: express.Application;
@@ -114,7 +115,7 @@ class ProductionGateway {
           tenant = await repo.tenantRepository.create(`Tenant ${tenant_id || 'Default'}`);
         }
 
-        const agent = await repo.agentRepository.create(tenant.id, {
+        const agent = await repo.agentRepository.create((tenant as any).id, {
           name: agent_name,
           type: agent_type,
           description,
@@ -194,7 +195,7 @@ class ProductionGateway {
         const session = await repo.sessionRepository.findById(sessionId);
         if (!session) { res.status(404).json({ error: 'Session not found' }); return; }
 
-        const stepNumber = session.currentStep + 1;
+        const stepNumber = (session as any).currentStep + 1;
         const toolName = this.extractToolFromInstruction(instruction);
 
         const step = await repo.sessionRepository.addStep(sessionId, {
@@ -270,6 +271,8 @@ class ProductionGateway {
         const { query, max_tools } = req.body;
         const agent = req.agent!;
 
+        const dbAgentRecord = await prisma.agent.findUnique({ where: { id: agent.id } });
+
         const dbAgent: Agent = {
           agent_id: agent.id,
           tenant_id: agent.tenantId,
@@ -277,13 +280,13 @@ class ProductionGateway {
           type: 'workflow_orchestrator',
           description: '',
           status: 'active',
-          permissions: {},
+          permissions: (dbAgentRecord?.permissions || {}) as Record<string, string[]>,
           autonomy_level: 'medium',
-          approval_required_for: [],
-          max_daily_actions: 10000,
-          sandbox_enabled: true,
-          context_window: 128000,
-          preferred_model: 'claude-3-5-sonnet-20241022',
+          approval_required_for: dbAgentRecord?.approvalRequiredFor || [],
+          max_daily_actions: dbAgentRecord?.maxDailyActions || 10000,
+          sandbox_enabled: dbAgentRecord?.sandboxEnabled ?? true,
+          context_window: dbAgentRecord?.contextWindow || 128000,
+          preferred_model: dbAgentRecord?.preferredModel || 'claude-3-5-sonnet-20241022',
           api_key: agent.apiKey,
           created_at: new Date().toISOString(),
           expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
@@ -318,7 +321,7 @@ class ProductionGateway {
         res.json({
           connection_id: connection.id,
           status: connection.status,
-          auth_link: oauthService.generateAuthLink ? `https://auth.n0va1o.io/connect/${connection.id}` : undefined,
+          auth_link: `https://auth.n0va1o.io/connect/${connection.id}`,
           provisioned_at: connection.provisionedAt,
         });
       } catch (err) {
@@ -388,7 +391,7 @@ class ProductionGateway {
         const session = await repo.sessionRepository.findById(session_id);
         if (!session) { res.status(404).json({ error: 'Session not found' }); return; }
 
-        const steps = (session.steps || []).filter((s: any) => s.status === 'completed').map((s: any, idx: number) => ({
+        const steps = ((session as any).steps || []).filter((s: any) => s.status === 'completed').map((s: any, idx: number) => ({
           step_number: idx + 1,
           tool_name: s.toolName,
           parameters: s.parameters,
@@ -453,13 +456,48 @@ class ProductionGateway {
 
   private setupIntegrationRoutes(): void {
     this.app.get('/v1/ai/integrations', authenticateAgent, async (req, res) => {
-      const { category, provider } = req.query;
-      let tools = toolRegistry.getAllTools();
+      try {
+        const { category, provider } = req.query;
+        const where: any = {};
+        if (category) where.category = category;
+        if (provider) where.provider = provider;
 
-      if (category) tools = tools.filter((t: any) => t.category === category);
-      if (provider) tools = tools.filter((t: any) => t.provider === provider);
+        const dbIntegrations = await prisma.integration.findMany({
+          where,
+          orderBy: [{ category: 'asc' }, { name: 'asc' }],
+        });
 
-      res.json({ tools: tools.map(t => ({ name: t.name, provider: t.provider, category: t.category })), total: tools.length });
+        const tools = toolRegistry.getAllTools();
+        const filteredTools = tools.filter((t: any) => {
+          if (category && t.category !== category) return false;
+          if (provider && t.provider !== provider) return false;
+          return true;
+        });
+
+        res.json({
+          integrations: dbIntegrations.map(i => ({
+            id: i.id,
+            provider: i.provider,
+            name: i.name,
+            category: i.category,
+            description: i.description,
+            auth_types: i.authTypes,
+            capabilities: i.capabilities,
+          })),
+          tools: filteredTools.map(t => ({ name: t.name, provider: t.provider, category: t.category })),
+          total: dbIntegrations.length,
+        });
+      } catch (err) {
+        res.status(400).json({ error: err instanceof Error ? err.message : 'Failed to fetch integrations' });
+      }
+    });
+
+    this.app.get('/v1/ai/integrations/categories', authenticateAgent, async (_req, res) => {
+      const categories = await prisma.integration.groupBy({
+        by: ['category'],
+        _count: { category: true },
+      });
+      res.json({ categories: categories.map(c => ({ name: c.category, count: c._count.category })) });
     });
   }
 
@@ -504,6 +542,34 @@ class ProductionGateway {
     }
   }
 
+  private async processMCPMessage(request: any): Promise<any> {
+    try {
+      let result: unknown;
+      switch (request.method) {
+        case 'initialize':
+          result = { protocolVersion: MCP_VERSION, serverInfo: { name: 'N0VA1O Gateway', version: '2026.07.0' }, capabilities: { tools: {}, sessions: {}, recipes: {}, audit: {} } };
+          break;
+        case 'tools/list':
+          result = { tools: toolRegistry.getAllTools().map(t => ({ name: t.name, description: t.description, inputSchema: { type: 'object', properties: t.parameters } })) };
+          break;
+        case 'tools/call':
+          result = { content: [{ type: 'text', text: JSON.stringify({ success: true, message: 'Tool call received', tool: request.params?.name }) }] };
+          break;
+        case 'resources/list':
+          result = { resources: [] };
+          break;
+        case 'prompts/list':
+          result = { prompts: [] };
+          break;
+        default:
+          return { jsonrpc: '2.0', id: request.id, error: { code: -32601, message: `Method not found: ${request.method}` } };
+      }
+      return { jsonrpc: '2.0', id: request.id, result };
+    } catch (err) {
+      return { jsonrpc: '2.0', id: request.id, error: { code: -32603, message: err instanceof Error ? err.message : 'Internal error' } };
+    }
+  }
+
   private extractToolFromInstruction(instruction: string): string {
     const lower = instruction.toLowerCase();
     if (lower.includes('slack') && (lower.includes('post') || lower.includes('send') || lower.includes('message'))) return 'slack.post_message';
@@ -535,7 +601,7 @@ class ProductionGateway {
     const tokens = await repo.connectionRepository.getDecryptedTokens(connection.id);
     if (!tokens) throw new Error('Failed to decrypt tokens');
 
-    const connector = createConnector(provider, tokens.access_token, tokens.refresh_token);
+    const connector = createConnector(provider, tokens.access_token, tokens.refresh_token) as any;
 
     switch (toolName) {
       case 'slack.post_message':
@@ -567,10 +633,23 @@ class ProductionGateway {
         this.wss.on('connection', (ws) => {
           const clientId = `ws_${Date.now().toString(36)}`;
           this.clients.set(clientId, ws);
+
+          ws.send(JSON.stringify({
+            jsonrpc: '2.0',
+            id: 'init',
+            result: {
+              protocol: 'MCP',
+              version: MCP_VERSION,
+              server: 'N0VA1O Gateway',
+              capabilities: { tools: {}, sessions: {}, recipes: {}, audit: {} },
+            },
+          }));
+
           ws.on('message', async (data) => {
             try {
               const request = JSON.parse(data.toString());
-              ws.send(JSON.stringify({ jsonrpc: '2.0', id: request.id, result: { status: 'ok' } }));
+              const response = await this.processMCPMessage(request);
+              ws.send(JSON.stringify(response));
             } catch {
               ws.send(JSON.stringify({ jsonrpc: '2.0', id: 'error', error: { code: -32700, message: 'Parse error' } }));
             }

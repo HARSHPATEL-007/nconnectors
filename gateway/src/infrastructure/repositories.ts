@@ -197,7 +197,7 @@ export const sessionRepository = {
         sessionId,
         stepNumber: step.stepNumber,
         toolName: step.toolName,
-        parameters: step.parameters,
+        parameters: step.parameters as any,
         status: step.status,
         result: step.result,
         latencyMs: step.latencyMs,

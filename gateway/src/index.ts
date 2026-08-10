@@ -3,6 +3,8 @@ import { connectDatabase, disconnectDatabase } from './infrastructure/database.j
 import { connectRedis, disconnectRedis } from './infrastructure/redis.js';
 import { logger } from './infrastructure/logger.js';
 import { config } from './config/index.js';
+import { seedDatabase } from './seeds/index.js';
+import { jobProcessor } from './infrastructure/jobs.js';
 
 async function main(): Promise<void> {
   console.log('╔══════════════════════════════════════════════════════════╗');
@@ -15,14 +17,17 @@ async function main(): Promise<void> {
   try {
     await connectDatabase();
     await connectRedis();
+    await seedDatabase();
+    jobProcessor.start();
     await gateway.start();
 
     console.log();
     console.log(`[N0VA1O] Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`[N0VA1O] Transports: ${config.transports.join(', ')}`);
     console.log(`[N0VA1O] Encryption: ${config.encryption.algorithm}`);
-    console.log(`[N0VA1O] Database: PostgreSQL`);
+    console.log(`[N0VA1O] Database: PostgreSQL (seeded)`);
     console.log(`[N0VA1O] Cache: Redis`);
+    console.log(`[N0VA1O] Background jobs: running`);
     console.log();
     console.log('[N0VA1O] Production gateway ready. Awaiting connections...');
     console.log();
@@ -35,6 +40,7 @@ async function main(): Promise<void> {
 async function shutdown(signal: string): Promise<void> {
   console.log(`\n[N0VA1O] Received ${signal}. Shutting down gracefully...`);
   try {
+    jobProcessor.stop();
     await gateway.stop();
     await disconnectRedis();
     await disconnectDatabase();
