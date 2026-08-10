@@ -1,0 +1,259 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id            String   @id @default(cuid())
+  name          String
+  encryptionKeyId String @default("key_tenant_default")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  settings      TenantSettings?
+  agents        Agent[]
+  connections   ConnectedAccount[]
+  sessions      Session[]
+  auditEntries  AuditEntry[]
+  escalations   EscalationCase[]
+  recipes       Recipe[]
+
+  @@map("tenants")
+}
+
+model TenantSettings {
+  id                String  @id @default(cuid())
+  tenantId          String  @unique @map("tenant_id")
+  tenant            Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  defaultTransport  String  @default("http_sse") @map("default_transport")
+  sandboxEnabled    Boolean @default(true) @map("sandbox_enabled")
+  hitlEnabled       Boolean @default(true) @map("hitl_enabled")
+  auditRetentionDays Int    @default(365) @map("audit_retention_days")
+  maxConcurrentAgents Int   @default(50) @map("max_concurrent_agents")
+  maxDailyActions   Int     @default(100000) @map("max_daily_actions")
+  mfaRequired       Boolean @default(true) @map("mfa_required")
+  sessionTtl        String  @default("8h") @map("session_ttl")
+}
+
+model Agent {
+  id                String   @id @default(cuid())
+  tenantId          String   @map("tenant_id")
+  tenant            Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name              String
+  type              String
+  description       String   @default("")
+  status            String   @default("active")
+  permissions       Json     @default("{}")
+  autonomyLevel     String   @default("medium") @map("autonomy_level")
+  approvalRequiredFor String[] @default([]) @map("approval_required_for")
+  webhookUrl        String?  @map("webhook_url")
+  maxDailyActions   Int      @default(10000) @map("max_daily_actions")
+  sandboxEnabled    Boolean  @default(true) @map("sandbox_enabled")
+  contextWindow     Int      @default(128000) @map("context_window")
+  preferredModel    String   @default("claude-3-5-sonnet-20241022") @map("preferred_model")
+  fallbackModel     String?  @map("fallback_model")
+  apiKey            String   @unique @map("api_key")
+  createdAt         DateTime @default(now()) @map("created_at")
+  expiresAt         DateTime @map("expires_at")
+
+  sessions          Session[]
+  auditEntries      AuditEntry[]
+  escalations       EscalationCase[]
+  recipes           Recipe[]
+
+  @@index([tenantId])
+  @@index([apiKey])
+  @@map("agents")
+}
+
+model ConnectedAccount {
+  id              String   @id @default(cuid())
+  tenantId        String   @map("tenant_id")
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  userId          String   @map("user_id")
+  provider        String
+  authType        String   @map("auth_type")
+  status          String   @default("active")
+  encryptedAccessToken String @map("encrypted_access_token")
+  encryptedRefreshToken String @map("encrypted_refresh_token")
+  expiresAt       DateTime @map("expires_at")
+  scopes          String[] @default([])
+  allowedActions  String[] @default([]) @map("allowed_actions")
+  blockedActions  String[] @default([]) @map("blocked_actions")
+  jitEnabled      Boolean  @default(true) @map("jit_enabled")
+  provisionedAt   DateTime @default(now()) @map("provisioned_at")
+  autoRefresh     Boolean  @default(true) @map("auto_refresh")
+  lastUsed        DateTime @default(now()) @map("last_used")
+  usageCount      Int      @default(0) @map("usage_count")
+  healthScore     Float    @default(1.0) @map("health_score")
+
+  @@index([tenantId])
+  @@index([provider])
+  @@map("connected_accounts")
+}
+
+model Session {
+  id              String   @id @default(cuid())
+  agentId         String   @map("agent_id")
+  agent           Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  tenantId        String   @map("tenant_id")
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  userId          String   @map("user_id")
+  status          String   @default("running")
+  context         Json     @default("{}")
+  toolsInjected   String[] @default([]) @map("tools_injected")
+  currentStep     Int      @default(0) @map("current_step")
+  sandboxConfig   Json?    @map("sandbox_config")
+  websocketUrl    String   @map("websocket_url")
+  sandboxUrl      String   @map("sandbox_url")
+  createdAt       DateTime @default(now()) @map("created_at")
+  expiresAt       DateTime @map("expires_at")
+
+  steps           SessionStep[]
+  escalations     EscalationCase[]
+
+  @@index([agentId])
+  @@index([tenantId])
+  @@map("sessions")
+}
+
+model SessionStep {
+  id            String   @id @default(cuid())
+  sessionId     String   @map("session_id")
+  session       Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  stepNumber    Int      @map("step_number")
+  toolName      String   @map("tool_name")
+  parameters    Json     @default("{}")
+  status        String   @default("pending")
+  result        String?
+  latencyMs     Int?     @map("latency_ms")
+  error         String?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([sessionId])
+  @@map("session_steps")
+}
+
+model AuditEntry {
+  id                  String   @id @default(cuid())
+  timestamp           DateTime @default(now())
+  tenantId            String   @map("tenant_id")
+  tenant              Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  agentId             String   @map("agent_id")
+  agent               Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  agentName           String   @map("agent_name")
+  agentVersion        String   @map("agent_version")
+  toolName            String   @map("tool_name")
+  toolParameters      Json     @map("tool_parameters")
+  sessionId           String   @map("session_id")
+  workflowId          String?  @map("workflow_id")
+  stepNumber          Int      @map("step_number")
+  intentClassification String  @map("intent_classification")
+  confidence          Float
+  reasoningChain      String[] @default([]) @map("reasoning_chain")
+  status              String
+  resultSummary       String   @map("result_summary")
+  latencyMs           Int      @map("latency_ms")
+  tokensConsumed      Int      @map("tokens_conumed")
+  approvalRequired    Boolean  @default(false) @map("approval_required")
+  approvedBy          String?  @map("approved_by")
+  approvalTimestamp   DateTime? @map("approval_timestamp")
+  ipAddress           String   @map("ip_address")
+  userAgent           String   @map("user_agent")
+  mfaVerified         Boolean  @default(false) @map("mfa_verified")
+  riskScore           Float    @map("risk_score")
+  hash                String
+  merkleRoot          String   @map("merkle_root")
+  blockchainAnchor    String?  @map("blockchain_anchor")
+
+  @@index([tenantId])
+  @@index([agentId])
+  @@index([timestamp])
+  @@index([status])
+  @@map("audit_entries")
+}
+
+model EscalationCase {
+  id                  String   @id @default(cuid())
+  tenantId            String   @map("tenant_id")
+  tenant              Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  agentId             String   @map("agent_id")
+  agent               Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  sessionId           String   @map("session_id")
+  session             Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  riskLevel           String   @map("risk_level")
+  riskScore           Float    @map("risk_score")
+  status              String   @default("pending")
+  action              Json
+  agentReasoning      String[] @default([]) @map("agent_reasoning")
+  dataAccessed        String[] @default([]) @map("data_accessed")
+  proposedParameters  Json     @map("proposed_parameters")
+  createdAt           DateTime @default(now()) @map("created_at")
+  timeoutAt           DateTime @map("timeout_at")
+  resolvedAt          DateTime? @map("resolved_at")
+  resolvedBy          String?  @map("resolved_by")
+  digitalSignature    String?  @map("digital_signature")
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("escalation_cases")
+}
+
+model Recipe {
+  id                  String   @id @default(cuid())
+  tenantId            String   @map("tenant_id")
+  tenant              Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  agentId             String   @map("agent_id")
+  agent               Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  name                String
+  description         String   @default("")
+  sourceSessionId     String   @map("source_session_id")
+  version             String   @default("1.0.0")
+  compiledSchema      String   @map("compiled_schema")
+  executionEndpoint   String   @map("execution_endpoint")
+  estimatedLatencyMs  Int      @map("estimated_latency_ms")
+  requiresApproval    Boolean  @default(false) @map("requires_approval")
+  riskScore           Float    @map("risk_score")
+  schedule            Json?
+  steps               Json     @default("[]")
+  createdAt           DateTime @default(now()) @map("created_at")
+  compiledAt          DateTime @map("compiled_at")
+
+  @@index([tenantId])
+  @@map("recipes")
+}
+
+model Integration {
+  id            String   @id @default(cuid())
+  provider      String   @unique
+  name          String
+  category      String
+  description   String   @default("")
+  iconUrl       String?  @map("icon_url")
+  authTypes     String[] @default([]) @map("auth_types")
+  capabilities  String[] @default([])
+  config        Json     @default("{}")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([category])
+  @@map("integrations")
+}
+
+model WebhookEvent {
+  id            String   @id @default(cuid())
+  eventId       String   @unique @map("event_id")
+  eventType     String   @map("event_type")
+  tenantId      String   @map("tenant_id")
+  payload       Json
+  signature     String
+  processedAt   DateTime? @map("processed_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([tenantId])
+  @@index([eventType])
+  @@map("webhook_events")
+}

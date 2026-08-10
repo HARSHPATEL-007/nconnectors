@@ -16,14 +16,14 @@ export const config: ServerConfig = {
     network_mode: 'isolated',
   },
   audit: {
-    retention_days: 365,
-    merkle_tree: true,
-    blockchain_anchor: false,
+    retention_days: parseInt(process.env.AUDIT_RETENTION_DAYS || '365', 10),
+    merkle_tree: process.env.AUDIT_MERKLE_TREE !== 'false',
+    blockchain_anchor: process.env.AUDIT_BLOCKCHAIN_ANCHIP === 'true',
   },
   hitl: {
-    critical_timeout_hours: 4,
-    high_timeout_hours: 24,
-    medium_timeout_hours: 72,
+    critical_timeout_hours: parseInt(process.env.HITL_CRITICAL_TIMEOUT_HOURS || '4', 10),
+    high_timeout_hours: parseInt(process.env.HITL_HIGH_TIMEOUT_HOURS || '24', 10),
+    medium_timeout_hours: parseInt(process.env.HITL_MEDIUM_TIMEOUT_HOURS || '72', 10),
   },
 };
 
@@ -34,15 +34,4 @@ export const RISK_THRESHOLDS = {
   high: 0.5,
   medium: 0.2,
   low: 0,
-} as const;
-
-export const ERROR_CODES = {
-  N0VA1O_RATE_LIMIT: { code: 429, message: 'Rate limit exceeded. Backoff and retry.' },
-  N0VA1O_AUTH_EXPIRED: { code: 401, message: 'Authentication expired. Re-authorization required.' },
-  N0VA1O_NOT_FOUND: { code: 404, message: 'Resource not found.' },
-  N0VA1O_SCHEMA_DRIFT: { code: 400, message: 'API schema changed. Auto-adapting.' },
-  N0VA1O_SANDBOX_ERROR: { code: 500, message: 'Sandbox execution failed.' },
-  N0VA1O_HITL_REQUIRED: { code: 403, message: 'Human approval required for this action.' },
-  N0VA1O_PROVIDER_DOWN: { code: 503, message: 'Third-party provider unavailable.' },
-  N0VA1O_QUOTA_EXCEEDED: { code: 402, message: 'Plan quota exceeded.' },
 } as const;
