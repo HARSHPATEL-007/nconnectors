@@ -46,6 +46,20 @@ async fn main() -> std::io::Result<()> {
         schema_modifier.clone(),
     ));
 
+    // Initialize Sandbox Engine
+    let sandbox_config = n0va1o::sandbox::engine::SandboxConfig::default();
+    let sandbox_engine = Arc::new(n0va1o::sandbox::engine::SandboxEngine::new(sandbox_config));
+
+    // Initialize Recipe Compiler & Engine
+    let recipe_compiler = Arc::new(n0va1o::recipes::compiler::RecipeCompiler::new());
+    let recipe_engine = Arc::new(n0va1o::recipes::engine::RecipeEngine::new());
+
+    // Initialize Webhook Manager
+    let webhook_manager = Arc::new(n0va1o::webhooks::WebhookManager::new());
+
+    // Initialize Plugin System (8-slot self-improving architecture)
+    let plugin_system = Arc::new(n0va1o::plugins::PluginSystem::new());
+
     // Shared state
     let escalations = Arc::new(tokio::sync::RwLock::new(HashMap::<String, handlers::n0va1o::escalations::EscalationCase>::new()));
     let connections = Arc::new(tokio::sync::RwLock::new(HashMap::<String, handlers::n0va1o::connections::Connection>::new()));
@@ -53,6 +67,10 @@ async fn main() -> std::io::Result<()> {
     info!("N0VA1O Integration Gateway ready");
     info!("  MCP SSE:  GET  /v1/n0va1o/mcp/sse");
     info!("  MCP Msg:  POST /v1/n0va1o/mcp/message");
+    info!("  Sandbox:  POST /v1/n0va1o/sandbox/create");
+    info!("  Recipes:  POST /v1/n0va1o/recipes/compile");
+    info!("  Webhooks: POST /v1/n0va1o/webhooks/events");
+    info!("  Plugins:  GET  /v1/n0va1o/plugins/slots");
     info!("  REST API: /v1/n0va1o/*");
 
     HttpServer::new(move || {
@@ -90,6 +108,19 @@ async fn main() -> std::io::Result<()> {
             }))
             .app_data(web::Data::new(handlers::n0va1o::mcp_transport::McpTransportState {
                 mcp_server: mcp_server.clone(),
+            }))
+            .app_data(web::Data::new(handlers::n0va1o::sandbox::SandboxAppState {
+                sandbox_engine: sandbox_engine.clone(),
+            }))
+            .app_data(web::Data::new(handlers::n0va1o::recipes::RecipesAppState {
+                compiler: recipe_compiler.clone(),
+                engine: recipe_engine.clone(),
+            }))
+            .app_data(web::Data::new(handlers::n0va1o::webhooks::WebhooksAppState {
+                webhook_manager: webhook_manager.clone(),
+            }))
+            .app_data(web::Data::new(handlers::n0va1o::plugins::PluginsAppState {
+                plugin_system: plugin_system.clone(),
             }))
             .configure(handlers::config_routes)
             .configure(ws::config_ws)

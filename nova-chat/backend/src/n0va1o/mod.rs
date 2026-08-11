@@ -7,9 +7,13 @@ pub mod connectors;
 pub mod hooks;
 pub mod intent;
 pub mod mcp;
+pub mod plugins;
+pub mod recipes;
+pub mod sandbox;
 pub mod schema;
 pub mod sessions;
 pub mod templates;
+pub mod webhooks;
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

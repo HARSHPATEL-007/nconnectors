@@ -97,8 +97,9 @@ impl SchemaModifier {
                     }
                 }
                 ModifierType::TemporalGating => {
+                    use chrono::Timelike;
                     let now = chrono::Utc::now();
-                    let hour = now.time().hour();
+                    let hour = now.hour();
                     if hour >= 18 || hour < 6 {
                         if let Some(obj) = modified.as_object_mut() {
                             obj.insert("_temporally_blocked".to_string(), serde_json::json!(true));

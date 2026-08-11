@@ -23,6 +23,7 @@ pub struct CatalogCategory {
     pub count: u32,
 }
 
+#[derive(Clone)]
 pub struct ConnectorCatalog {
     entries: Vec<CatalogEntry>,
     categories: HashMap<String, Vec<CatalogEntry>>,

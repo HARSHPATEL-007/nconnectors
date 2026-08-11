@@ -5,6 +5,8 @@ use redis::Client;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
+use crate::ws::ChatSession;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WsMessage {
     pub event: String,
@@ -96,7 +98,8 @@ impl WsState {
 
 mod addr {
     use actix::prelude::*;
-    use super::{ChatSession, WsMessage};
+    use crate::ws::ChatSession;
+    use super::WsMessage;
 
     pub fn do_send(addr: &Addr<ChatSession>, msg: WsMessage) -> Result<(), SendError<WsMessage>> {
         addr.try_send(msg)

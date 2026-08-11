@@ -17,7 +17,7 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-use crate::n0va1o::{ConnectorInfo, ConnectionStatus, SyncEvent};
+use crate::n0va1o::{ConnectorInfo, ConnectionResponse, ConnectionStatus, SyncEvent};
 
 #[async_trait]
 pub trait Connector: Send + Sync {

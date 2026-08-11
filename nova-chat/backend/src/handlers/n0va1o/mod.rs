@@ -4,8 +4,12 @@ pub mod connections;
 pub mod escalations;
 pub mod mcp_transport;
 pub mod metrics;
+pub mod plugins;
+pub mod recipes;
+pub mod sandbox;
 pub mod sessions;
 pub mod tools;
+pub mod webhooks;
 
 use actix_web::web;
 
@@ -19,6 +23,10 @@ pub fn config_routes(cfg: &mut web::ServiceConfig) {
             .configure(connections::config)
             .configure(escalations::config)
             .configure(metrics::config)
+            .configure(sandbox::config)
+            .configure(recipes::config)
+            .configure(webhooks::config)
+            .configure(plugins::config)
             .configure(mcp_transport::config_mcp),
     );
 }
