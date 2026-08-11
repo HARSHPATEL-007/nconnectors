@@ -121,7 +121,7 @@ impl AgentRegistry {
             fallback_model: request.fallback_model,
             tools_available: tools.clone(),
             api_key: api_key.clone(),
-            session_endpoint: format!("wss://n0va1o.io/sessions/{}", agent_id),
+            session_endpoint: format!("wss://n0va1o.io/sessions/{}", agent_id.clone()),
             created_at: now.to_rfc3339(),
             updated_at: now.to_rfc3339(),
         };
@@ -131,19 +131,23 @@ impl AgentRegistry {
             agents.insert(agent_id.clone(), agent);
         }
 
+        let session_endpoint = format!("wss://n0va1o.io/sessions/{}", agent_id);
+        let sandbox_endpoint = if request.sandbox_enabled {
+            Some(format!("https://sandbox.n0va1o.io/{}", agent_id))
+        } else {
+            None
+        };
+        let recipe_endpoint = format!("https://recipes.n0va1o.io/{}", agent_id);
+
         RegisterAgentResponse {
             agent_id,
             api_key,
             status: "active".to_string(),
             connected_account,
             tools_available: tools,
-            session_endpoint: format!("wss://n0va1o.io/sessions/{}", agent_id),
-            sandbox_endpoint: if request.sandbox_enabled {
-                Some(format!("https://sandbox.n0va1o.io/{}", agent_id))
-            } else {
-                None
-            },
-            recipe_endpoint: format!("https://recipes.n0va1o.io/{}", agent_id),
+            session_endpoint,
+            sandbox_endpoint,
+            recipe_endpoint,
             created_at: now.to_rfc3339(),
             expires_at: expires.to_rfc3339(),
         }
