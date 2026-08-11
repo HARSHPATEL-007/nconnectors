@@ -1,0 +1,55 @@
+.interrogation-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stat-card.critical { border-color: rgba(239, 68, 68, 0.3); }
+.stat-card.critical svg { color: var(--red); }
+.stat-value { font-size: 1.3rem; font-weight: 700; display: block; }
+.stat-label { font-size: 0.75rem; color: var(--text-secondary); }
+
+.rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 16px; }
+
+.room-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.room-card:hover { border-color: var(--indigo); }
+.room-card.risk-critical { border-color: rgba(239, 68, 68, 0.3); }
+.room-card.risk-high { border-color: rgba(245, 158, 11, 0.3); }
+
+.room-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.room-risk { display: flex; align-items: center; gap: 8px; }
+.risk-score { font-weight: 600; }
+.level-critical { color: var(--red); font-size: 0.75rem; text-transform: uppercase; }
+.level-high { color: var(--amber); font-size: 0.75rem; text-transform: uppercase; }
+.room-card h3 { margin-bottom: 4px; }
+.room-agent { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px; }
+.room-factors { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.factor-tag {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--red);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+}
+
+.room-details { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+.detail-section { margin-bottom: 12px; }
+.detail-section h4 { font-size: 0.8rem; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.detail-section ul { padding-left: 16px; font-size: 0.8rem; color: var(--text-secondary); }
+.detail-section pre { background: var(--bg-primary); padding: 10px; border-radius: var(--radius-sm); font-size: 0.75rem; overflow-x: auto; }
+.room-actions { display: flex; gap: 6px; margin-top: 12px; }
