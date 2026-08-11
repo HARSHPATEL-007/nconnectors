@@ -1,6 +1,11 @@
-﻿pub mod github;
+﻿pub mod discord;
+pub mod github;
 pub mod google_drive;
+pub mod hubspot;
+pub mod jira;
+pub mod notion;
 pub mod slack;
+pub mod stripe;
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
