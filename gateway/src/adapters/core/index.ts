@@ -7,7 +7,7 @@ export interface AdapterConfig {
   category: string;
   description: string;
   icon?: string;
-  authTypes: ('oauth2' | 'api_key' | 'basic' | 'bearer')[];
+  authTypes: ('oauth2' | 'oauth1' | 'api_key' | 'basic' | 'bearer' | 'custom')[];
   baseUrl: string;
   rateLimit?: {
     requests: number;
@@ -44,7 +44,7 @@ export interface AdapterResponse<T = unknown> {
 }
 
 export interface AuthCredentials {
-  type: 'oauth2' | 'api_key' | 'basic' | 'bearer';
+  type: 'oauth2' | 'oauth1' | 'api_key' | 'basic' | 'bearer' | 'custom';
   accessToken?: string;
   refreshToken?: string;
   apiKey?: string;
