@@ -1,0 +1,79 @@
+version: "3.9"
+
+services:
+  n0va1o-gateway:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - N0VA1O_ENV=production
+      - N0VA1O_SECRET_KEY=${N0VA1O_SECRET_KEY:-n0va1o_transcendent_secret_key_2026}
+      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=postgresql://n0va1o:n0va1o@postgres:5432/n0va1o
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - n0va1o-net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 8G
+
+  n0va1o-frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - n0va1o-gateway
+    networks:
+      - n0va1o-net
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - n0va1o-net
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: n0va1o
+      POSTGRES_USER: n0va1o
+      POSTGRES_PASSWORD: n0va1o
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - n0va1o-net
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - n0va1o-net
+    restart: unless-stopped
+
+volumes:
+  redis-data:
+  postgres-data:
+
+networks:
+  n0va1o-net:
+    driver: bridge

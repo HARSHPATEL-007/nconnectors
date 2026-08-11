@@ -1,0 +1,102 @@
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.page-header h2 { font-size: 1.5rem; font-weight: 600; }
+.page-header .subtitle { color: var(--text-secondary); font-size: 0.875rem; margin-top: 4px; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-primary { background: var(--indigo); color: white; }
+.btn-primary:hover { background: var(--indigo-hover); }
+.btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--border); }
+.btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--red); }
+.btn-danger:hover { background: rgba(239, 68, 68, 0.25); }
+.btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+.btn-icon { padding: 6px; }
+
+.badge {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.badge-active, .badge-completed, .badge-approved { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+.badge-paused, .badge-warning, .badge-pending { background: rgba(245, 158, 11, 0.15); color: var(--amber); }
+.badge-failed, .badge-danger, .badge-rejected { background: rgba(239, 68, 68, 0.15); color: var(--red); }
+.badge-degraded { background: rgba(245, 158, 11, 0.15); color: var(--amber); }
+
+.metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+
+.metric-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.metric-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.metric-indigo .metric-icon { background: rgba(99, 102, 241, 0.15); color: var(--indigo); }
+.metric-green .metric-icon { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+.metric-amber .metric-icon { background: rgba(245, 158, 11, 0.15); color: var(--amber); }
+.metric-purple .metric-icon { background: rgba(139, 92, 246, 0.15); color: var(--purple); }
+
+.metric-value { font-size: 1.5rem; font-weight: 700; display: block; }
+.metric-label { font-size: 0.8rem; color: var(--text-secondary); display: block; }
+.metric-trend { font-size: 0.75rem; color: var(--green); }
+
+.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+
+.chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.chart-card h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; color: var(--text-secondary); }
+
+.status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.status-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.status-card h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; color: var(--text-secondary); }
+
+.health-items { display: flex; flex-direction: column; gap: 10px; }
+.health-item { display: flex; align-items: center; gap: 10px; font-size: 0.875rem; }
+.health-status { margin-left: auto; font-size: 0.75rem; color: var(--green); text-transform: capitalize; }
+
+.activity-list { display: flex; flex-direction: column; gap: 10px; }
+.activity-item { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; padding: 8px; border-radius: var(--radius-sm); background: rgba(255, 255, 255, 0.02); }
+.activity-item.activity-success svg { color: var(--green); }
+.activity-item.activity-warning svg { color: var(--amber); }
+.activity-item.activity-info svg { color: var(--blue); }
+.activity-text { flex: 1; }
+.activity-time { color: var(--text-muted); font-size: 0.75rem; }
