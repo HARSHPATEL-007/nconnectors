@@ -100,7 +100,7 @@ impl ConnectorCatalog {
         let mut entries = Vec::with_capacity(1100);
         let mut id_counter = 0;
 
-        let categories: Vec<(&str, Vec<(&str, Vec<&str>>)>)> = vec![
+        let categories: Vec<(&'static str, Vec<(&'static str, Vec<&'static str>)>)> = vec![
             ("Social & Collaboration", vec![
                 ("Team Chat", vec!["Slack", "Microsoft Teams", "Discord", "Telegram", "WhatsApp Business", "Signal", "Mattermost", "Rocket.Chat", "Zulip", "Flock", "Chanty", "Flowdock", "Glip", "HipChat", "Symphony", "Viber Business", "WeChat Work", "Line Works", "KakaoTalk Work", "Matrix/Element", "IRC", "XMPP/Jabber", "Google Chat", "Figma Slack", "Twitch Chat", "YouTube Live Chat", "Reddit", "Guilded"]),
                 ("Video Conferencing", vec!["Zoom", "Google Meet", "Microsoft Teams", "Webex", "GoToMeeting", "BlueJeans", "Jitsi", "Whereby", "Lifesize", "RingCentral Video", "8x8 Video", "DialPad Meet", "Zoho Meeting", "BigMarker", "ClickMeeting", "Zoom Phone", "Amazon Chouse", "Cisco Meeting"]),
@@ -217,9 +217,9 @@ impl ConnectorCatalog {
             ]),
         ];
 
-        for (cat_name, subcategories) in categories {
-            for (sub_name, integrations) in subcategories {
-                for integration_name in integrations {
+        for &(cat_name, ref subcategories) in categories.iter() {
+            for &(sub_name, ref integrations) in subcategories.iter() {
+                for &integration_name in integrations.iter() {
                     id_counter += 1;
                     let id = format!("n0va1o.{:.30}", integration_name.to_lowercase().replace([' ', '/', '.', '-'], "_"));
                     let capabilities = generate_capabilities(cat_name, integration_name);

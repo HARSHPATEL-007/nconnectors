@@ -36,7 +36,7 @@ async fn list_users(db: web::Data<Database>) -> Result<HttpResponse> {
 
 async fn get_user(db: web::Data<Database>, user_id: web::Path<String>) -> Result<HttpResponse> {
     let users: Collection<User> = db.collection("users");
-    let oid = ObjectId::parse_str(&user_id)
+    let oid = ObjectId::parse_str(&*user_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid user ID"))?;
 
     let user = users
@@ -54,7 +54,7 @@ async fn update_user(
     req: web::Json<UpdateUserRequest>,
 ) -> Result<HttpResponse> {
     let users: Collection<User> = db.collection("users");
-    let oid = ObjectId::parse_str(&user_id)
+    let oid = ObjectId::parse_str(&*user_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid user ID"))?;
 
     let mut update_doc = mongodb::bson::doc! { "updated_at": Utc::now() };
@@ -85,7 +85,7 @@ async fn update_user(
 
 async fn get_presence(db: web::Data<Database>, user_id: web::Path<String>) -> Result<HttpResponse> {
     let presence: Collection<Presence> = db.collection("presence");
-    let oid = ObjectId::parse_str(&user_id)
+    let oid = ObjectId::parse_str(&*user_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid user ID"))?;
 
     let p = presence
@@ -109,7 +109,7 @@ async fn update_presence(
     req: web::Json<UpdatePresenceRequest>,
 ) -> Result<HttpResponse> {
     let presence: Collection<Presence> = db.collection("presence");
-    let oid = ObjectId::parse_str(&user_id)
+    let oid = ObjectId::parse_str(&*user_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid user ID"))?;
 
     let now = Utc::now();

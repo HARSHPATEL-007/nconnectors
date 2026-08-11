@@ -33,7 +33,7 @@ async fn list_rooms(
     let user_id = user.as_ref().map(|u| u.sub.clone()).unwrap_or_default();
 
     let filter = mongodb::bson::doc! {
-        "members.user_id": ObjectId::parse_str(&user_id).ok().unwrap_or_else(ObjectId::new),
+        "members.user_id": ObjectId::parse_str(&*user_id).ok().unwrap_or_else(ObjectId::new),
         "is_archived": false,
     };
 
@@ -73,7 +73,7 @@ async fn create_room(
 ) -> Result<HttpResponse> {
     let rooms: Collection<Room> = db.collection("rooms");
     let user_id = user.as_ref().map(|u| u.sub.clone()).unwrap_or_default();
-    let creator_oid = ObjectId::parse_str(&user_id).unwrap_or_else(|_| ObjectId::new());
+    let creator_oid = ObjectId::parse_str(&*user_id).unwrap_or_else(|_| ObjectId::new());
 
     let now = Utc::now();
     let mut members = vec![RoomMember {
@@ -125,7 +125,7 @@ async fn create_room(
 
 async fn get_room(db: web::Data<Database>, room_id: web::Path<String>) -> Result<HttpResponse> {
     let rooms: Collection<Room> = db.collection("rooms");
-    let oid = ObjectId::parse_str(&room_id)
+    let oid = ObjectId::parse_str(&*room_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid room ID"))?;
 
     let room = rooms
@@ -143,7 +143,7 @@ async fn update_room(
     req: web::Json<UpdateRoomRequest>,
 ) -> Result<HttpResponse> {
     let rooms: Collection<Room> = db.collection("rooms");
-    let oid = ObjectId::parse_str(&room_id)
+    let oid = ObjectId::parse_str(&*room_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid room ID"))?;
 
     let mut update_doc = mongodb::bson::doc! { "updated_at": Utc::now() };
@@ -172,7 +172,7 @@ async fn get_room_messages(
     query: web::Query<std::collections::HashMap<String, String>>,
 ) -> Result<HttpResponse> {
     let messages: Collection<Message> = db.collection("messages");
-    let oid = ObjectId::parse_str(&room_id)
+    let oid = ObjectId::parse_str(&*room_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid room ID"))?;
 
     let page = query.get("page").and_then(|p| p.parse::<u64>().ok()).unwrap_or(1);
@@ -215,9 +215,9 @@ async fn add_member(
 ) -> Result<HttpResponse> {
     let rooms: Collection<Room> = db.collection("rooms");
     let (room_id, user_id) = path.into_inner();
-    let room_oid = ObjectId::parse_str(&room_id)
+    let room_oid = ObjectId::parse_str(&*room_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid room ID"))?;
-    let user_oid = ObjectId::parse_str(&user_id)
+    let user_oid = ObjectId::parse_str(&*user_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid user ID"))?;
 
     let member = RoomMember {
@@ -249,9 +249,9 @@ async fn remove_member(
 ) -> Result<HttpResponse> {
     let rooms: Collection<Room> = db.collection("rooms");
     let (room_id, user_id) = path.into_inner();
-    let room_oid = ObjectId::parse_str(&room_id)
+    let room_oid = ObjectId::parse_str(&*room_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid room ID"))?;
-    let user_oid = ObjectId::parse_str(&user_id)
+    let user_oid = ObjectId::parse_str(&*user_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid user ID"))?;
 
     rooms
@@ -275,10 +275,10 @@ async fn join_room(
     user: Option<web::ReqData<crate::middleware::auth::Claims>>,
 ) -> Result<HttpResponse> {
     let rooms: Collection<Room> = db.collection("rooms");
-    let room_oid = ObjectId::parse_str(&room_id)
+    let room_oid = ObjectId::parse_str(&*room_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid room ID"))?;
     let user_id = user.as_ref().map(|u| u.sub.clone()).unwrap_or_default();
-    let user_oid = ObjectId::parse_str(&user_id).unwrap_or_else(|_| ObjectId::new());
+    let user_oid = ObjectId::parse_str(&*user_id).unwrap_or_else(|_| ObjectId::new());
 
     let member = RoomMember {
         user_id: user_oid,
@@ -309,10 +309,10 @@ async fn leave_room(
     user: Option<web::ReqData<crate::middleware::auth::Claims>>,
 ) -> Result<HttpResponse> {
     let rooms: Collection<Room> = db.collection("rooms");
-    let room_oid = ObjectId::parse_str(&room_id)
+    let room_oid = ObjectId::parse_str(&*room_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid room ID"))?;
     let user_id = user.as_ref().map(|u| u.sub.clone()).unwrap_or_default();
-    let user_oid = ObjectId::parse_str(&user_id).unwrap_or_else(|_| ObjectId::new());
+    let user_oid = ObjectId::parse_str(&*user_id).unwrap_or_else(|_| ObjectId::new());
 
     rooms
         .update_one(

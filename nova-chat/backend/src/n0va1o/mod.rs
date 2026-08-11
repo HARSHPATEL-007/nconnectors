@@ -5,6 +5,7 @@ pub mod auth;
 pub mod catalog;
 pub mod connectors;
 pub mod hooks;
+pub mod integrations;
 pub mod intent;
 pub mod mcp;
 pub mod plugins;

@@ -13,6 +13,17 @@ pub struct WsMessage {
     pub payload: serde_json::Value,
 }
 
+impl actix::Message for WsMessage {
+    type Result = ();
+}
+
+#[allow(dead_code)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WsMessageOld {
+    pub event: String,
+    pub payload: serde_json::Value,
+}
+
 #[derive(Debug, Clone)]
 pub struct ConnectionInfo {
     pub user_id: String,

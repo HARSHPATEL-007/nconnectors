@@ -23,7 +23,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 
 async fn get_message(db: web::Data<Database>, message_id: web::Path<String>) -> Result<HttpResponse> {
     let messages: Collection<Message> = db.collection("messages");
-    let oid = ObjectId::parse_str(&message_id)
+    let oid = ObjectId::parse_str(&*message_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid message ID"))?;
 
     let msg = messages
@@ -42,7 +42,7 @@ async fn edit_message(
     user: Option<web::ReqData<crate::middleware::auth::Claims>>,
 ) -> Result<HttpResponse> {
     let messages: Collection<Message> = db.collection("messages");
-    let oid = ObjectId::parse_str(&message_id)
+    let oid = ObjectId::parse_str(&*message_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid message ID"))?;
     let user_id = user.as_ref().map(|u| u.sub.clone()).unwrap_or_default();
 
@@ -54,7 +54,7 @@ async fn edit_message(
 
     messages
         .update_one(
-            mongodb::bson::doc! { "_id": oid, "sender.user_id": ObjectId::parse_str(&user_id).ok().unwrap_or_else(ObjectId::new) },
+            mongodb::bson::doc! { "_id": oid, "sender.user_id": ObjectId::parse_str(&*user_id).ok().unwrap_or_else(ObjectId::new) },
             mongodb::bson::doc! {
                 "$set": {
                     "content.body": &req.body,
@@ -76,7 +76,7 @@ async fn delete_message(
     message_id: web::Path<String>,
 ) -> Result<HttpResponse> {
     let messages: Collection<Message> = db.collection("messages");
-    let oid = ObjectId::parse_str(&message_id)
+    let oid = ObjectId::parse_str(&*message_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid message ID"))?;
 
     messages
@@ -94,7 +94,7 @@ async fn add_reaction(
     user: Option<web::ReqData<crate::middleware::auth::Claims>>,
 ) -> Result<HttpResponse> {
     let messages: Collection<Message> = db.collection("messages");
-    let oid = ObjectId::parse_str(&message_id)
+    let oid = ObjectId::parse_str(&*message_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid message ID"))?;
     let user_id = user.as_ref().map(|u| u.sub.clone()).unwrap_or_default();
 
@@ -149,7 +149,7 @@ async fn remove_reaction(
 ) -> Result<HttpResponse> {
     let messages: Collection<Message> = db.collection("messages");
     let (message_id, emoji) = path.into_inner();
-    let oid = ObjectId::parse_str(&message_id)
+    let oid = ObjectId::parse_str(&*message_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid message ID"))?;
     let user_id = user.as_ref().map(|u| u.sub.clone()).unwrap_or_default();
 
@@ -170,7 +170,7 @@ async fn remove_reaction(
 
 async fn get_thread(db: web::Data<Database>, message_id: web::Path<String>) -> Result<HttpResponse> {
     let messages: Collection<Message> = db.collection("messages");
-    let oid = ObjectId::parse_str(&message_id)
+    let oid = ObjectId::parse_str(&*message_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid message ID"))?;
 
     let filter = mongodb::bson::doc! { "thread_id": oid };
@@ -199,10 +199,10 @@ async fn reply_thread(
     user: Option<web::ReqData<crate::middleware::auth::Claims>>,
 ) -> Result<HttpResponse> {
     let messages: Collection<Message> = db.collection("messages");
-    let oid = ObjectId::parse_str(&message_id)
+    let oid = ObjectId::parse_str(&*message_id)
         .map_err(|_| actix_web::error::ErrorBadRequest("Invalid message ID"))?;
     let user_id = user.as_ref().map(|u| u.sub.clone()).unwrap_or_default();
-    let user_oid = ObjectId::parse_str(&user_id).unwrap_or_else(|_| ObjectId::new());
+    let user_oid = ObjectId::parse_str(&*user_id).unwrap_or_else(|_| ObjectId::new());
 
     let body = req.get("body").and_then(|b| b.as_str()).unwrap_or("");
     let now = Utc::now();

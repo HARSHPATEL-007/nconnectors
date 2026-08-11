@@ -148,12 +148,13 @@ impl ChatSession {
                 let user_id = self.user_id.clone();
                 let mut p = payload.clone();
                 p["user_id"] = json!(user_id);
+                let room_id = p.get("room_id").and_then(|r| r.as_str()).map(|s| s.to_string());
                 let msg = WsMessage {
                     event: "message.reaction".to_string(),
                     payload: p,
                 };
-                if let Some(room_id) = p.get("room_id").and_then(|r| r.as_str()) {
-                    self.state.broadcast_to_room(room_id, &msg, Some(&user_id));
+                if let Some(rid) = room_id {
+                    self.state.broadcast_to_room(&rid, &msg, Some(&user_id));
                 }
             }
             "typing.start" => {

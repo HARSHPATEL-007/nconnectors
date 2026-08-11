@@ -56,10 +56,8 @@ async fn message_handler(
 async fn ws_handler(
     req: HttpRequest,
     stream: web::Payload,
-    state: web::Data<McpTransportState>,
+    _state: web::Data<McpTransportState>,
 ) -> Result<HttpResponse> {
-    actix_ws::handle(&req, stream, |ctx| async move {
-        let _server = state.mcp_server.clone();
-        ctx
-    })
+    let (response, _session, _stream) = actix_ws::handle(&req, stream)?;
+    Ok(response)
 }

@@ -73,6 +73,8 @@ async fn main() -> std::io::Result<()> {
     info!("  Plugins:  GET  /v1/n0va1o/plugins/slots");
     info!("  REST API: /v1/n0va1o/*");
 
+    let app_config = config.clone();
+
     HttpServer::new(move || {
         let cors = Cors::permissive();
 
@@ -81,7 +83,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(db.clone()))
             .app_data(web::Data::new(redis.clone()))
             .app_data(web::Data::new(ws_state.clone()))
-            .app_data(web::Data::new(config.clone()))
+            .app_data(web::Data::new(app_config.clone()))
             .app_data(web::Data::new(handlers::n0va1o::agents::AppState {
                 agent_registry: agent_registry.clone(),
             }))
