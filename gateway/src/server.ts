@@ -12,6 +12,7 @@ import { toolRegistry } from './services/tool-registry.js';
 import { hitlService } from './services/hitl.js';
 import { schemaModifier } from './services/modifiers.js';
 import { createConnector } from './services/connectors.js';
+import { adapterEngine } from './services/adapter-engine.js';
 import { encrypt, decrypt, generateApiKey, generateConnectionId, generateAgentId, generateSessionId, generateAuditId, generateEscalationId, generateRecipeId, hashData, generateMerkleRoot } from './services/crypto.js';
 import * as repo from './infrastructure/repositories.js';
 import { prisma } from './infrastructure/database.js';
@@ -455,6 +456,82 @@ class ProductionGateway {
   }
 
   private setupIntegrationRoutes(): void {
+    // Execute any adapter directly via REST
+    this.app.post('/v1/adapters/:provider/:action', authenticateAgent, async (req, res) => {
+      try {
+        const { provider, action } = req.params;
+        const params = req.body || {};
+
+        const result = await adapterEngine.execute({
+          provider,
+          action,
+          params,
+        });
+
+        res.json(result);
+      } catch (err) {
+        res.status(400).json({ error: err instanceof Error ? err.message : 'Adapter execution failed' });
+      }
+    });
+
+    // List all 1,519 adapters
+    this.app.get('/v1/adapters', authenticateAgent, async (req, res) => {
+      try {
+        const { category, search } = req.query;
+
+        let providers = adapterEngine.getAvailableProviders();
+
+        if (category) {
+          providers = providers.filter(p => p.category === category);
+        }
+
+        if (search) {
+          const lower = (search as string).toLowerCase();
+          providers = providers.filter(
+            p => p.name.toLowerCase().includes(lower) || p.description.toLowerCase().includes(lower)
+          );
+        }
+
+        res.json({
+          adapters: providers.map(p => ({
+            id: p.id,
+            name: p.name,
+            category: p.category,
+            description: p.description,
+            authTypes: p.authTypes,
+            baseUrl: p.baseUrl,
+          })),
+          total: providers.length,
+          categories: adapterEngine.getCategories(),
+        });
+      } catch (err) {
+        res.status(400).json({ error: err instanceof Error ? err.message : 'Failed to list adapters' });
+      }
+    });
+
+    // Get adapter categories
+    this.app.get('/v1/adapters/categories', authenticateAgent, async (_req, res) => {
+      const categories = adapterEngine.getCategories();
+      const result = categories.map(cat => ({
+        name: cat,
+        count: adapterEngine.getProvidersByCategory(cat).length,
+      }));
+      res.json({ categories: result });
+    });
+
+    // Get single adapter info
+    this.app.get('/v1/adapters/:provider', authenticateAgent, async (req, res) => {
+      const providers = adapterEngine.getAvailableProviders();
+      const provider = providers.find(p => p.id === req.params.provider);
+
+      if (!provider) {
+        res.status(404).json({ error: 'Adapter not found' });
+        return;
+      }
+
+      res.json(provider);
+    });
+
     this.app.get('/v1/ai/integrations', authenticateAgent, async (req, res) => {
       try {
         const { category, provider } = req.query;
@@ -524,19 +601,8 @@ class ProductionGateway {
   private async handleHTTPMCP(req: express.Request, res: express.Response): Promise<void> {
     const request = req.body;
     try {
-      let result: unknown;
-      switch (request.method) {
-        case 'initialize':
-          result = { protocolVersion: MCP_VERSION, serverInfo: { name: 'N0VA1O Gateway', version: '2026.07.0' }, capabilities: { tools: {}, sessions: {}, recipes: {}, audit: {} } };
-          break;
-        case 'tools/list':
-          result = { tools: toolRegistry.getAllTools().map(t => ({ name: t.name, description: t.description, inputSchema: { type: 'object', properties: t.parameters } })) };
-          break;
-        default:
-          res.json({ jsonrpc: '2.0', id: request.id, error: { code: -32601, message: `Method not found: ${request.method}` } });
-          return;
-      }
-      res.json({ jsonrpc: '2.0', id: request.id, result });
+      const response = await this.processMCPMessage(request);
+      res.json(response);
     } catch (err) {
       res.json({ jsonrpc: '2.0', id: request.id, error: { code: -32603, message: err instanceof Error ? err.message : 'Internal error' } });
     }
@@ -547,14 +613,47 @@ class ProductionGateway {
       let result: unknown;
       switch (request.method) {
         case 'initialize':
-          result = { protocolVersion: MCP_VERSION, serverInfo: { name: 'N0VA1O Gateway', version: '2026.07.0' }, capabilities: { tools: {}, sessions: {}, recipes: {}, audit: {} } };
+          result = {
+            protocolVersion: MCP_VERSION,
+            serverInfo: { name: 'N0VA1O Gateway', version: '2026.07.0' },
+            capabilities: { tools: {}, sessions: {}, recipes: {}, audit: {} },
+          };
           break;
-        case 'tools/list':
-          result = { tools: toolRegistry.getAllTools().map(t => ({ name: t.name, description: t.description, inputSchema: { type: 'object', properties: t.parameters } })) };
+        case 'tools/list': {
+          // Return all 1,519 adapters as MCP tools
+          const allProviders = adapterEngine.getAvailableProviders();
+          result = {
+            tools: allProviders.map(p => ({
+              name: p.id,
+              description: p.description,
+              inputSchema: {
+                type: 'object',
+                properties: {
+                  action: { type: 'string', enum: ['list', 'get', 'create', 'update', 'delete', 'search', 'ping'], description: 'Action to perform' },
+                  params: { type: 'object', description: 'Action parameters' },
+                },
+              },
+            })),
+          };
           break;
-        case 'tools/call':
-          result = { content: [{ type: 'text', text: JSON.stringify({ success: true, message: 'Tool call received', tool: request.params?.name }) }] };
+        }
+        case 'tools/call': {
+          // Execute any of the 1,519 adapters
+          const toolName = request.params?.name;
+          const toolParams = request.params?.arguments || {};
+          const [provider, action] = toolName.split('.');
+
+          const execResult = await adapterEngine.execute({
+            provider,
+            action: toolParams.action || action || 'list',
+            params: toolParams.params || toolParams,
+          });
+
+          result = {
+            content: [{ type: 'text', text: JSON.stringify(execResult) }],
+          };
           break;
+        }
         case 'resources/list':
           result = { resources: [] };
           break;
@@ -591,34 +690,28 @@ class ProductionGateway {
 
   private async executeRealTool(toolName: string, params: Record<string, unknown>, agent: { id: string; tenantId: string }): Promise<unknown> {
     const [provider, action] = toolName.split('.');
+
+    // Get credentials from connection or use defaults
     const connections = await repo.connectionRepository.findByTenant(agent.tenantId);
     const connection = connections.find((c: any) => c.provider === provider);
 
-    if (!connection) {
+    const credentials = connection
+      ? { type: 'oauth2' as const, accessToken: (await repo.connectionRepository.getDecryptedTokens(connection.id))?.access_token }
+      : { type: 'api_key' as const };
+
+    // Use adapter engine for all providers (1,519 adapters)
+    const result = await adapterEngine.execute({
+      provider,
+      action: action || 'list',
+      params,
+      credentials,
+    });
+
+    if (!result.success && connection === undefined) {
       return { success: false, error: `No connection found for ${provider}. Connect ${provider} first.` };
     }
 
-    const tokens = await repo.connectionRepository.getDecryptedTokens(connection.id);
-    if (!tokens) throw new Error('Failed to decrypt tokens');
-
-    const connector = createConnector(provider, tokens.access_token, tokens.refresh_token) as any;
-
-    switch (toolName) {
-      case 'slack.post_message':
-        return connector.postMessage(params.channel as string || '#general', params.text as string || params.instruction as string);
-      case 'slack.list_channels':
-        return connector.listChannels();
-      case 'github.list_pull_requests':
-        return connector.listPullRequests(params.owner as string, params.repo as string, params.state as string);
-      case 'github.create_issue':
-        return connector.createIssue(params.owner as string, params.repo as string, params.title as string, params.body as string);
-      case 'google_drive.list_files':
-        return connector.listFiles(params.query as string, params.pageSize as number);
-      case 'stripe.list_charges':
-        return connector.listCharges(params.limit as number);
-      default:
-        return { success: true, message: `Tool ${toolName} executed`, provider };
-    }
+    return result;
   }
 
   async start(): Promise<void> {
