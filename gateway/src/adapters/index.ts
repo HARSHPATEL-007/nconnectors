@@ -1,53 +1,29 @@
-// Adapter Framework — Main Export
-// Registers all production connectors
+// Generated Adapters Index — 1519 total adapters
+// Auto-generated from catalog — DO NOT EDIT MANUALLY
 
-import { registry } from './core/index.js';
-import { SalesforceAdapter, HubSpotAdapter, PipedriveAdapter } from './crm/index.js';
-import { SlackAdapter, MicrosoftTeamsAdapter, DiscordAdapter } from './communication/index.js';
-import { GitHubAdapter, GitLabAdapter, JiraAdapter } from './devops/index.js';
-import { StripeAdapter, PayPalAdapter } from './finance/index.js';
-import { S3Adapter, GoogleDriveAdapter, DropboxAdapter } from './storage/index.js';
-import { MailchimpAdapter, KlaviyoAdapter } from './marketing/index.js';
-
-// Register all adapters with the registry
-registry.register('salesforce', SalesforceAdapter);
-registry.register('hubspot', HubSpotAdapter);
-registry.register('pipedrive', PipedriveAdapter);
-
-registry.register('slack', SlackAdapter);
-registry.register('microsoft_teams', MicrosoftTeamsAdapter);
-registry.register('discord', DiscordAdapter);
-
-registry.register('github', GitHubAdapter);
-registry.register('gitlab', GitLabAdapter);
-registry.register('jira', JiraAdapter);
-
-registry.register('stripe', StripeAdapter);
-registry.register('paypal', PayPalAdapter);
-
-registry.register('aws_s3', S3Adapter);
-registry.register('google_drive', GoogleDriveAdapter);
-registry.register('dropbox', DropboxAdapter);
-
-registry.register('mailchimp', MailchimpAdapter);
-registry.register('klaviyo', KlaviyoAdapter);
-
-// Re-export everything
-export * from './core/index.js';
-export * from './crm/index.js';
-export * from './communication/index.js';
-export * from './devops/index.js';
-export * from './finance/index.js';
-export * from './storage/index.js';
-export * from './marketing/index.js';
-
-// Utility function to create adapter from connection
-export function createAdapter(connectionId: string, provider: string, credentials: { type: string; accessToken?: string; apiKey?: string; username?: string; password?: string }) {
-  return registry.create(provider, {
-    type: credentials.type as any,
-    accessToken: credentials.accessToken,
-    apiKey: credentials.apiKey,
-    username: credentials.username,
-    password: credentials.password,
-  });
-}
+export * from './generated/crm.js';
+export * from './generated/communication.js';
+export * from './generated/productivity.js';
+export * from './generated/devops.js';
+export * from './generated/finance.js';
+export * from './generated/finance_2.js';
+export * from './generated/analytics.js';
+export * from './generated/hr.js';
+export * from './generated/support.js';
+export * from './generated/sales.js';
+export * from './generated/education.js';
+export * from './generated/real_estate.js';
+export * from './generated/legal.js';
+export * from './generated/logistics.js';
+export * from './generated/travel.js';
+export * from './generated/health.js';
+export * from './generated/iot.js';
+export * from './generated/media.js';
+export * from './generated/nonprofit.js';
+export * from './generated/government.js';
+export * from './generated/agriculture.js';
+export * from './generated/energy.js';
+export * from './generated/insurance.js';
+export * from './generated/manufacturing.js';
+export * from './generated/retail.js';
+export * from './generated/consulting.js';

@@ -1,0 +1,136 @@
+{
+  "total": 1519,
+  "files": [
+    {
+      "file": "crm.ts",
+      "category": "crm",
+      "count": 81
+    },
+    {
+      "file": "communication.ts",
+      "category": "communication",
+      "count": 28
+    },
+    {
+      "file": "productivity.ts",
+      "category": "productivity",
+      "count": 41
+    },
+    {
+      "file": "devops.ts",
+      "category": "devops",
+      "count": 57
+    },
+    {
+      "file": "finance.ts",
+      "category": "finance",
+      "count": 100
+    },
+    {
+      "file": "finance_2.ts",
+      "category": "finance",
+      "count": 12
+    },
+    {
+      "file": "analytics.ts",
+      "category": "analytics",
+      "count": 60
+    },
+    {
+      "file": "hr.ts",
+      "category": "hr",
+      "count": 60
+    },
+    {
+      "file": "support.ts",
+      "category": "support",
+      "count": 60
+    },
+    {
+      "file": "sales.ts",
+      "category": "sales",
+      "count": 60
+    },
+    {
+      "file": "education.ts",
+      "category": "education",
+      "count": 60
+    },
+    {
+      "file": "real_estate.ts",
+      "category": "real_estate",
+      "count": 60
+    },
+    {
+      "file": "legal.ts",
+      "category": "legal",
+      "count": 60
+    },
+    {
+      "file": "logistics.ts",
+      "category": "logistics",
+      "count": 60
+    },
+    {
+      "file": "travel.ts",
+      "category": "travel",
+      "count": 60
+    },
+    {
+      "file": "health.ts",
+      "category": "health",
+      "count": 60
+    },
+    {
+      "file": "iot.ts",
+      "category": "iot",
+      "count": 60
+    },
+    {
+      "file": "media.ts",
+      "category": "media",
+      "count": 60
+    },
+    {
+      "file": "nonprofit.ts",
+      "category": "nonprofit",
+      "count": 60
+    },
+    {
+      "file": "government.ts",
+      "category": "government",
+      "count": 60
+    },
+    {
+      "file": "agriculture.ts",
+      "category": "agriculture",
+      "count": 60
+    },
+    {
+      "file": "energy.ts",
+      "category": "energy",
+      "count": 60
+    },
+    {
+      "file": "insurance.ts",
+      "category": "insurance",
+      "count": 60
+    },
+    {
+      "file": "manufacturing.ts",
+      "category": "manufacturing",
+      "count": 60
+    },
+    {
+      "file": "retail.ts",
+      "category": "retail",
+      "count": 60
+    },
+    {
+      "file": "consulting.ts",
+      "category": "consulting",
+      "count": 60
+    }
+  ],
+  "generatedAt": "2026-08-11T04:53:30.797Z"
+}
