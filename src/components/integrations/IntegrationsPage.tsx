@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useAppStore } from '@/store/useAppStore';
 import { Modal } from '@/components/ui/Modal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMediaQuery, useDebounce } from '@/lib/hooks';
 import {
   Search,

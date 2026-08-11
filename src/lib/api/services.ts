@@ -17,13 +17,14 @@ export interface Agent {
   name: string;
   type: string;
   description: string;
-  status: 'active' | 'paused' | 'degraded' | 'failed';
+  status: 'active' | 'paused' | 'degraded' | 'failed' | 'error';
   permissions: Record<string, string[]>;
   autonomy_level: string;
   max_daily_actions: number;
   sandbox_enabled: boolean;
   created_at: string;
   tools_available: string[];
+  api_key: string;
 }
 
 export interface Session {

@@ -14,24 +14,50 @@ interface Integration {
 
 interface Agent {
   agent_id: string;
+  id: string;
   name: string;
   type: string;
   description: string;
-  status: 'active' | 'paused' | 'degraded' | 'failed';
-  permissions: Record<string, string[]>;
-  autonomy_level: string;
+  status: 'active' | 'paused' | 'degraded' | 'failed' | 'error';
+  permissions: string[];
+  autonomy_level: 'low' | 'medium' | 'high' | 'full';
   max_daily_actions: number;
   sandbox_enabled: boolean;
   created_at: string;
   tools_available: string[];
+  toolsAvailable: number;
+  toolsUsed: number;
+  successRate: number;
+  model: string;
+  approvalRequired: string[];
+  api_key: string;
+}
+
+interface SessionStep {
+  step: number;
+  action: string;
+  tool: string;
+  status: 'completed' | 'running' | 'failed' | 'pending';
+  latencyMs: number;
 }
 
 interface Session {
   session_id: string;
+  id: string;
   agent_id: string;
-  status: string;
+  agentName: string;
+  status: 'running' | 'completed' | 'paused' | 'failed' | 'waiting_approval';
   tools_injected: string[];
   current_step: number;
+  currentStep: number;
+  totalSteps: number;
+  context: string;
+  type: string;
+  steps: SessionStep[];
+  startTime: string;
+  tokensUsed: number;
+  latencyMs: number;
+  riskScore: number;
   created_at: string;
   expires_at: string;
 }
@@ -40,11 +66,16 @@ interface AuditEntry {
   id: string;
   timestamp: string;
   agent_name: string;
+  agentName: string;
   tool_name: string;
-  status: string;
+  toolName: string;
+  status: 'success' | 'failed' | 'blocked' | 'pending_approval';
   result_summary: string;
+  action: string;
+  result: string;
   latency_ms: number;
   risk_score: number;
+  riskScore: number;
 }
 
 interface EscalationCase {
@@ -196,15 +227,21 @@ export const useAppStore = create<AppState>((set, get) => ({
       const data = await agentsService.getAll();
       const normalized = data.map((a) => ({
         agent_id: a.agent_id,
+        id: a.agent_id,
         name: a.name,
         type: a.type,
         description: a.description,
         status: a.status,
-        permissions: a.permissions,
-        autonomy_level: a.autonomy_level,
+        permissions: Object.values(a.permissions).flat(),
+        autonomy_level: a.autonomy_level as Agent['autonomy_level'],
         max_daily_actions: a.max_daily_actions,
         sandbox_enabled: a.sandbox_enabled,
         tools_available: a.tools_available,
+        toolsAvailable: a.tools_available.length,
+        toolsUsed: 0,
+        successRate: 0.95,
+        model: 'claude-3-5-sonnet',
+        approvalRequired: [],
         created_at: a.created_at,
         api_key: a.api_key,
       }));
@@ -240,7 +277,16 @@ export const useAppStore = create<AppState>((set, get) => ({
     try {
       const filter = get().auditFilter;
       const data = await auditService.getAll({ status: filter === 'all' ? undefined : filter, limit: 50 });
-      set({ auditEntries: data, loading: { ...get().loading, audit: false } });
+      const normalized = data.map((e) => ({
+        ...e,
+        agentName: e.agent_name,
+        toolName: e.tool_name,
+        action: e.result_summary,
+        result: e.result_summary,
+        riskScore: e.risk_score,
+        status: e.status as AuditEntry['status'],
+      }));
+      set({ auditEntries: normalized, loading: { ...get().loading, audit: false } });
     } catch (err) {
       set((state) => ({
         errors: { ...state.errors, audit: err instanceof Error ? err.message : 'Failed to fetch audit entries' },

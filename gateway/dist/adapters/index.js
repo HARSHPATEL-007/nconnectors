@@ -1,0 +1,29 @@
+// Generated Adapters Index — 1519 total adapters
+// Auto-generated from catalog — DO NOT EDIT MANUALLY
+export * from './generated/crm.js';
+export * from './generated/communication.js';
+export * from './generated/productivity.js';
+export * from './generated/devops.js';
+export * from './generated/finance.js';
+export * from './generated/finance_2.js';
+export * from './generated/analytics.js';
+export * from './generated/hr.js';
+export * from './generated/support.js';
+export * from './generated/sales.js';
+export * from './generated/education.js';
+export * from './generated/real_estate.js';
+export * from './generated/legal.js';
+export * from './generated/logistics.js';
+export * from './generated/travel.js';
+export * from './generated/health.js';
+export * from './generated/iot.js';
+export * from './generated/media.js';
+export * from './generated/nonprofit.js';
+export * from './generated/government.js';
+export * from './generated/agriculture.js';
+export * from './generated/energy.js';
+export * from './generated/insurance.js';
+export * from './generated/manufacturing.js';
+export * from './generated/retail.js';
+export * from './generated/consulting.js';
+//# sourceMappingURL=index.js.map
