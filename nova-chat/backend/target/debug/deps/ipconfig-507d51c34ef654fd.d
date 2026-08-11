@@ -1,0 +1,10 @@
+C:\Users\hvipa\Downloads\connectors\nconnectors\nova-chat\backend\target\debug\deps\ipconfig-507d51c34ef654fd.d: C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\ipconfig-0.3.4\src\lib.rs C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\ipconfig-0.3.4\src\adapter.rs C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\ipconfig-0.3.4\src\bindings\mod.rs C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\ipconfig-0.3.4\src\bindings\win64.rs C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\ipconfig-0.3.4\src\computer.rs C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\ipconfig-0.3.4\src\error.rs
+
+C:\Users\hvipa\Downloads\connectors\nconnectors\nova-chat\backend\target\debug\deps\libipconfig-507d51c34ef654fd.rmeta: C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\ipconfig-0.3.4\src\lib.rs C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\ipconfig-0.3.4\src\adapter.rs C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\ipconfig-0.3.4\src\bindings\mod.rs C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\ipconfig-0.3.4\src\bindings\win64.rs C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\ipconfig-0.3.4\src\computer.rs C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\ipconfig-0.3.4\src\error.rs
+
+C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\ipconfig-0.3.4\src\lib.rs:
+C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\ipconfig-0.3.4\src\adapter.rs:
+C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\ipconfig-0.3.4\src\bindings\mod.rs:
+C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\ipconfig-0.3.4\src\bindings\win64.rs:
+C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\ipconfig-0.3.4\src\computer.rs:
+C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\ipconfig-0.3.4\src\error.rs:

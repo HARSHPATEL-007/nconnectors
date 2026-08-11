@@ -1,0 +1,1 @@
+(dyn Fn(serde_json::Value) -> Result<serde_json::Value, ToolError> + std::marker::Send + Sync + 'static)

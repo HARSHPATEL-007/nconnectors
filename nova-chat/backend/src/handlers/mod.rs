@@ -1,4 +1,5 @@
 pub mod auth;
+pub mod n0va1o;
 pub mod rooms;
 pub mod messages;
 pub mod users;
@@ -14,5 +15,6 @@ pub fn config_routes(cfg: &mut web::ServiceConfig) {
             .configure(messages::config)
             .configure(users::config)
             .configure(search::config)
+            .configure(n0va1o::config_routes)
     );
 }

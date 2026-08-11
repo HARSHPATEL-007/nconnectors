@@ -169,7 +169,7 @@ impl ConnectorCatalog {
                 ("Prototyping", vec!["InVision", "Marvel", "Principle", "ProtoPie", "Framer", "Origami Studio", "Flinto", "Protopie", "Axure RP", "Balsamiq", "Moqups", "Mockplus", "Justinmind", "UXPin", "Pidoco"]),
                 ("Asset Management", vec!["Brandfolder", "Bynder", "Canto", "DAM", "Adobe Experience Manager", "Cloudinary", "Imgix", "ImageKit", "Uploadcare", "Filepicker", "Filestack", "PCloud", "Dropbox", "Google Drive", "OneDrive"]),
             ]),
-            ("Communication", vec!(
+            ("Communication", vec![
                 ("Voice & Telephony", vec!["Twilio", "Vonage", "RingCentral", "8x8", "DialPad", "Grasshopper", "Nextiva", "Ooma", "Phone.com", "Line2", "Freshcaller", "Aircall", "JustCall", "OpenPhone", "Google Voice"]),
                 ("SMS", vec!["Twilio", "Vonage", "MessageBird", "Sinch", "Plivo", "Telnyx", "TextMagic", "SimpleTexting", "EZTexting", "SMSBump", "Postscript", "Attentive", "Klaviyo SMS", "SMSAPI", "ClickSend"]),
                 ("Live Chat", vec!["Intercom", "Drift", "Crisp", "Tidio", "LiveChat", "Olark", "HelpCrunch", "Userlike", "PureChat", "Tawk.to", "Freshchat", "Zendesk Chat", "SnapEngage", "PurerChat", "Chaport"]),
@@ -185,7 +185,7 @@ impl ConnectorCatalog {
                 ("ML Ops", vec!["MLflow", "Weights & Biases", "Neptune.ai", "Comet", "DVC", "Pachyderm", "Kubeflow", "Seldon", "BentoML", "Ray", "ClearML", "Truera", "Arize AI", "Fiddler", "WhyLabs"]),
                 ("Vector Databases", vec!["Pinecone", "Weaviate", "Milvus", "Qdrant", "Chroma", "pgVector", "Redis Vector", "LanceDB", "Marqo", "Vespa", "Zilliz", "Tencent Vector", "MongoDB Atlas", "SingleStore", "Supabase"]),
             ]),
-            ("Legal & Compliance", vec!(
+            ("Legal & Compliance", vec![
                 ("Contract Management", vec!["Ironclad", "Conga", "DocuSign CLM", "Icertis", "Agiloft", "ContractWorks", "SpringCM", "PandaDoc", "Zoho Sign", "SignNow", "OneSpan", "Lexion", "LinkSquares", "Evisort", "Spotdraft"]),
                 ("Compliance", vec!["Vanta", "Drata", "Secureframe", "Hyperproof", "LogicGate", "OneTrust", "StandardFusion", "SkillQualification", "Compyl", "Laika", "Tugboat Logic", "A-LIGN", "Coalfire", "Cure53", "Securicy"]),
                 ("eDiscovery", vec!["Relativity", "Everlaw", "Logikcull", "Disco", "Reveal", "Brainspace", "Nuix", "OpenText", "Exterro", "Zapproved", "Nextpoint", "CloudCourt", "Everlaw", "Onna", "Disco"]),
@@ -195,7 +195,7 @@ impl ConnectorCatalog {
                 ("Telehealth", vec!["Doxy.me", "Teladoc", "Amwell", "MDLive", "MeMD", "Doctor on Demand", "HealthTap", "SnapMD", "VSee", "Chiron Health", "BlueSky", "TheraNest", "SimplePractice", "TherapyNotes", "Practice Better"]),
                 ("Medical Devices", vec!["Philips Health", "GE Healthcare", "Siemens Healthineers", "Medtronic", "Abbott", "Roche", "Thermo Fisher", "Becton Dickinson", "Stryker", "Boston Scientific", "Zimmer Biomet", "Smith+Nephew", "Olympus", "Intuitive", "Edwards Lifesciences"]),
             ]),
-            ("Education", vec!(
+            ("Education", vec![
                 ("LMS", vec!["Canvas", "Blackboard", "D2L", "Moodle", "Schoology", "Brightspace", "Edmodo", "Google Classroom", "Apple Classroom", "Thinkific", "Teachable", "Kajabi", "Podia", "LearnWorlds", "Skillshare"]),
                 ("Student Information", vec!["PowerSchool", "Infinite Campus", "Skyward", "Alma", "Illuminate", "Frontline", "Ellucian", "Workday Student", "Oracle Campus", "Jenzabar", "Banner", "PeopleSoft", "Colleague", "SCT", "Slate"]),
                 ("Assessment", vec!["Turnitin", "Gradescope", "ExamSoft", "Proctorio", "ProctorU", "Honorlock", "Respondus", "TestReach", "Questionmark", "Crowdmark", "Edulastic", "ZipGrade", "AKINDO", "Mettl", "HackerRank"]),

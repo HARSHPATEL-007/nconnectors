@@ -1,8 +1,14 @@
 pub mod adapters;
+pub mod agents;
+pub mod audit;
 pub mod auth;
 pub mod catalog;
 pub mod connectors;
 pub mod hooks;
+pub mod intent;
+pub mod mcp;
+pub mod schema;
+pub mod sessions;
 pub mod templates;
 
 use serde::{Deserialize, Serialize};

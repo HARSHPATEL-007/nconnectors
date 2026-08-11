@@ -7,7 +7,7 @@ import { IntegrationsPage } from '@/components/integrations/IntegrationsPage';
 import { AgentsPage } from '@/components/agents/AgentsPage';
 import { SessionsPage } from '@/components/agents/SessionsPage';
 import { AuditPage } from '@/components/agents/AuditPage';
-import { EscalationPage } from '@/components/agents/EscalationPage';
+import { InterrogationRoom } from '@/components/agents/InterrogationRoom';
 import { SettingsPage } from '@/components/agents/SettingsPage';
 
 export default function Home() {
@@ -20,7 +20,8 @@ export default function Home() {
     agents: <AgentsPage />,
     sessions: <SessionsPage />,
     audit: <AuditPage />,
-    escalation: <EscalationPage />,
+    escalation: <InterrogationRoom />,
+    interrogation: <InterrogationRoom />,
     settings: <SettingsPage />,
   };
 

@@ -103,54 +103,71 @@ export const agentsService = {
     agent_type: string;
     permissions?: Record<string, string[]>;
     autonomy_level?: string;
+    sandbox_enabled?: boolean;
+    max_daily_actions?: number;
+    description?: string;
   }): Promise<Agent> {
-    return apiClient.post('/v1/ai/agents/register', params);
+    return apiClient.post('/v1/n0va1o/agents/register', params);
   },
 
   async getAll(): Promise<Agent[]> {
-    return apiClient.get('/v1/ai/agents');
+    return apiClient.get('/v1/n0va1o/agents');
   },
 
   async toggleStatus(agentId: string): Promise<Agent> {
-    return apiClient.put(`/v1/ai/agents/${agentId}/toggle`, {});
+    return apiClient.post(`/v1/n0va1o/agents/${agentId}/toggle`, {});
+  },
+
+  async getById(agentId: string): Promise<Agent> {
+    return apiClient.get(`/v1/n0va1o/agents/${agentId}`);
   },
 };
 
 export const integrationsService = {
   async getAll(category?: string): Promise<Integration[]> {
     const params = category ? `?category=${category}` : '';
-    const response = await apiClient.get<{ integrations: Integration[] }>(`/v1/ai/integrations${params}`);
+    const response = await apiClient.get<{ integrations: Integration[] }>(`/v1/n0va1o/integrations${params}`);
     return response.integrations;
   },
 
   async getCategories(): Promise<Array<{ name: string; count: number }>> {
-    const response = await apiClient.get<{ categories: Array<{ name: string; count: number }> }>('/v1/ai/integrations/categories');
+    const response = await apiClient.get<{ categories: Array<{ name: string; count: number }> }>('/v1/n0va1o/integrations/categories');
     return response.categories;
   },
 
   async discoverTools(query: string, maxTools: number = 5): Promise<ToolDiscoveryResult> {
-    return apiClient.post('/v1/ai/tools/discover', { query, max_tools: maxTools });
+    return apiClient.post('/v1/n0va1o/tools/discover', { query, max_tools: maxTools });
+  },
+
+  async listTools(): Promise<unknown[]> {
+    return apiClient.get('/v1/n0va1o/tools');
   },
 };
 
 export const sessionsService = {
   async create(params: {
+    agent_id: string;
     context: { user_id: string; tenant_id?: string; session_type?: string };
     tools?: string[];
+    sandbox_config?: { cpu_quota: number; ram_quota: number; timeout_seconds: number; network_mode: string };
   }): Promise<Session> {
-    return apiClient.post('/v1/ai/sessions/create', params);
+    return apiClient.post('/v1/n0va1o/sessions/create', params);
+  },
+
+  async getAll(): Promise<Session[]> {
+    return apiClient.get('/v1/n0va1o/sessions');
   },
 
   async get(sessionId: string): Promise<Session> {
-    return apiClient.get(`/v1/ai/sessions/${sessionId}`);
+    return apiClient.get(`/v1/n0va1o/sessions/${sessionId}`);
   },
 
-  async execute(sessionId: string, instruction: string): Promise<unknown> {
-    return apiClient.post(`/v1/ai/sessions/${sessionId}/execute`, { instruction });
+  async suspend(sessionId: string): Promise<unknown> {
+    return apiClient.post(`/v1/n0va1o/sessions/${sessionId}/suspend`, {});
   },
 
-  async close(sessionId: string): Promise<unknown> {
-    return apiClient.delete(`/v1/ai/sessions/${sessionId}`);
+  async resume(sessionId: string): Promise<unknown> {
+    return apiClient.post(`/v1/n0va1o/sessions/${sessionId}/resume`, {});
   },
 };
 
@@ -161,29 +178,47 @@ export const auditService = {
     if (params?.status) searchParams.set('status', params.status);
     if (params?.since) searchParams.set('since', params.since);
     const query = searchParams.toString() ? `?${searchParams.toString()}` : '';
-    const response = await apiClient.get<{ entries: AuditEntry[]; merkle_root: string }>(`/v1/ai/audit${query}`);
-    return response.entries;
+    return apiClient.get<AuditEntry[]>(`/v1/n0va1o/audit${query}`);
+  },
+
+  async getByAgent(agentId: string): Promise<AuditEntry[]> {
+    return apiClient.get<AuditEntry[]>(`/v1/n0va1o/audit/agent/${agentId}`);
+  },
+
+  async getPending(): Promise<AuditEntry[]> {
+    return apiClient.get<AuditEntry[]>('/v1/n0va1o/audit/pending');
   },
 };
 
 export const escalationsService = {
   async getAll(status?: string): Promise<EscalationCase[]> {
     const params = status ? `?status=${status}` : '';
-    const response = await apiClient.get<{ escalations: EscalationCase[] }>(`/v1/ai/escalations${params}`);
-    return response.escalations;
+    return apiClient.get<EscalationCase[]>(`/v1/n0va1o/escalations${params}`);
   },
 
-  async resolve(escalationId: string, decision: string): Promise<EscalationCase> {
-    return apiClient.post(`/v1/ai/escalations/${escalationId}/resolve`, { decision });
+  async getPending(): Promise<EscalationCase[]> {
+    return apiClient.get<EscalationCase[]>('/v1/n0va1o/escalations/pending');
+  },
+
+  async approve(escalationId: string): Promise<EscalationCase> {
+    return apiClient.post(`/v1/n0va1o/escalations/${escalationId}/approve`, {});
+  },
+
+  async reject(escalationId: string): Promise<EscalationCase> {
+    return apiClient.post(`/v1/n0va1o/escalations/${escalationId}/reject`, {});
+  },
+
+  async modify(escalationId: string, parameters: Record<string, unknown>): Promise<EscalationCase> {
+    return apiClient.post(`/v1/n0va1o/escalations/${escalationId}/modify`, parameters);
   },
 };
 
 export const metricsService = {
   async getDashboard(): Promise<DashboardMetrics> {
-    return apiClient.get('/metrics');
+    return apiClient.get('/v1/n0va1o/metrics/dashboard');
   },
 
-  async getHealth(): Promise<{ status: string; checks: Record<string, unknown> }> {
+  async getHealth(): Promise<{ status: string; checks: Record<string, unknown }> {
     return apiClient.get('/health');
   },
 };

@@ -20,7 +20,7 @@ const navItems = [
   { id: 'agents', label: 'Agents', icon: Bot },
   { id: 'sessions', label: 'Sessions', icon: Activity },
   { id: 'audit', label: 'Audit Trail', icon: Shield },
-  { id: 'escalation', label: 'Escalation', icon: AlertTriangle, badge: 1 },
+  { id: 'escalation', label: 'Interrogation Room', icon: AlertTriangle, badge: 3 },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 

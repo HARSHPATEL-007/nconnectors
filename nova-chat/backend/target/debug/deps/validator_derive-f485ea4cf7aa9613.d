@@ -1,0 +1,9 @@
+C:\Users\hvipa\Downloads\connectors\nconnectors\nova-chat\backend\target\debug\deps\validator_derive-f485ea4cf7aa9613.d: C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\validator_derive-0.16.0\src\lib.rs C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\validator_derive-0.16.0\src\asserts.rs C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\validator_derive-0.16.0\src\lit.rs C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\validator_derive-0.16.0\src\quoting.rs C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\validator_derive-0.16.0\src\validation.rs
+
+C:\Users\hvipa\Downloads\connectors\nconnectors\nova-chat\backend\target\debug\deps\validator_derive-f485ea4cf7aa9613.dll: C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\validator_derive-0.16.0\src\lib.rs C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\validator_derive-0.16.0\src\asserts.rs C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\validator_derive-0.16.0\src\lit.rs C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\validator_derive-0.16.0\src\quoting.rs C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\validator_derive-0.16.0\src\validation.rs
+
+C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\validator_derive-0.16.0\src\lib.rs:
+C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\validator_derive-0.16.0\src\asserts.rs:
+C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\validator_derive-0.16.0\src\lit.rs:
+C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\validator_derive-0.16.0\src\quoting.rs:
+C:\Users\hvipa\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\validator_derive-0.16.0\src\validation.rs:

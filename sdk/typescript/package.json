@@ -1,0 +1,26 @@
+{
+  "name": "@n0va1o/sdk",
+  "version": "2026.07.0",
+  "description": "N0VA1O Infinite Integration Gateway — TypeScript/JavaScript SDK",
+  "main": "n0va1o/index.ts",
+  "types": "n0va1o/index.ts",
+  "license": "MIT",
+  "author": "N0VA",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/n0va/n0va1o-sdk-ts"
+  },
+  "keywords": [
+    "n0va1o",
+    "mcp",
+    "ai-gateway",
+    "integrations",
+    "agent-tools"
+  ],
+  "peerDependencies": {
+    "typescript": ">=4.5.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
